@@ -25,7 +25,7 @@ sudo pacman -S --needed python zip unzip jq ripgrep
 ## Quick start
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/gstrand99/zen-auto-style.git
 cd zen-auto-style
 chmod +x build.sh check.sh install.sh uninstall.sh
 ./check.sh
@@ -45,8 +45,10 @@ Then:
 5. Run `omarchy theme set <theme-name>` to test live synchronization.
 
 This extension uses a privileged Firefox experiment API. Zen must permit the
-XPI to be installed; unsigned-extension restrictions may apply depending on
-the Zen build.
+XPI to be installed. The installer enables Zen's extension experiment support
+and permits unsigned extensions in the selected profile. Disabling signature
+enforcement allows any unsigned extension to be installed, so only install
+extensions you trust.
 
 ## How it works
 
@@ -165,6 +167,11 @@ Remove the extension in Zen, then run:
 ./uninstall.sh
 ```
 
-The uninstall script removes the native host and Omarchy hook. It deliberately
-does not rewrite browser CSS or remove the Omarchy template automatically;
-timestamped backups are retained for manual restoration.
+The uninstall script removes the native host, Omarchy hook, managed browser
+files, and the exact import/preference blocks added by the installer. CSS
+outside those blocks is preserved. The Omarchy template is removed only if it
+still matches the version shipped by this repository.
+
+## License
+
+Zen Auto Style is available under the [MIT License](LICENSE).

@@ -79,36 +79,46 @@ backup_file() {
   fi
 }
 
-ensure_import() {
+ensure_managed_block() {
   local target=$1
-  local import=$2
+  local begin_marker=$2
+  local end_marker=$3
+  local content=$4
   local temporary
 
   touch "$target"
-  if grep -Fqx "$import" "$target"; then
-    return
-  fi
+  backup_file "$target"
+  temporary="$(mktemp)"
+
+  awk \
+    -v begin="$begin_marker" \
+    -v end="$end_marker" '
+      $0 == begin { managed = 1; next }
+      $0 == end { managed = 0; next }
+      !managed { print }
+    ' "$target" >"$temporary"
+
+  {
+    printf '%s\n%s\n%s\n\n' "$begin_marker" "$content" "$end_marker"
+    cat "$temporary"
+  } >"$temporary.new"
+
+  mv "$temporary.new" "$target"
+  rm -f "$temporary"
+}
+
+remove_legacy_line() {
+  local target=$1
+  local line=$2
+  local temporary
+
+  [[ -f $target ]] || return
+  grep -Fqx "$line" "$target" || return 0
 
   backup_file "$target"
   temporary="$(mktemp)"
-  {
-    printf '%s\n\n' "$import"
-    cat "$target"
-  } >"$temporary"
+  grep -Fvx "$line" "$target" >"$temporary" || true
   mv "$temporary" "$target"
-}
-
-ensure_user_pref() {
-  local target=$1
-  local preference='user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);'
-
-  touch "$target"
-  if grep -Fqx "$preference" "$target"; then
-    return
-  fi
-
-  backup_file "$target"
-  printf '\n%s\n' "$preference" >>"$target"
 }
 
 mod_is_available() {
@@ -202,16 +212,35 @@ done
   done
 } >"$chrome_dir/zen-auto-style-mods.css"
 
-ensure_import \
+remove_legacy_line \
   "$chrome_dir/userChrome.css" \
   '@import url("zen-auto-style-chrome.css");'
-ensure_import \
+remove_legacy_line \
   "$chrome_dir/userChrome.css" \
   '@import url("zen-auto-style-mods.css");'
-ensure_import \
+remove_legacy_line \
   "$chrome_dir/userContent.css" \
   '@import url("zen-auto-style-content.css");'
-ensure_user_pref "$zen_profile/user.js"
+
+ensure_managed_block \
+  "$chrome_dir/userChrome.css" \
+  '/* BEGIN ZEN AUTO STYLE */' \
+  '/* END ZEN AUTO STYLE */' \
+  $'@import url("zen-auto-style-chrome.css");\n@import url("zen-auto-style-mods.css");'
+ensure_managed_block \
+  "$chrome_dir/userContent.css" \
+  '/* BEGIN ZEN AUTO STYLE */' \
+  '/* END ZEN AUTO STYLE */' \
+  '@import url("zen-auto-style-content.css");'
+
+remove_legacy_line \
+  "$zen_profile/user.js" \
+  'user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);'
+ensure_managed_block \
+  "$zen_profile/user.js" \
+  '// BEGIN ZEN AUTO STYLE' \
+  '// END ZEN AUTO STYLE' \
+  $'user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);\nuser_pref("extensions.experiments.enabled", true);\nuser_pref("xpinstall.signatures.required", false);'
 
 backup_file "$chrome_dir/custom-zen.css"
 ln -sfn \

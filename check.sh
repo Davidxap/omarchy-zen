@@ -40,7 +40,7 @@ jq empty \
 
 unzip -t "$project_dir/build/zen-auto-style.xpi" >/dev/null
 
-if rg -n 'YOUR-USER|TODO|FIXME|gstrand|youremail' \
+if rg -n 'YOUR-USER|TODO|FIXME|youremail' \
   "$project_dir" \
   --glob '!build/**' \
   --glob '!check.sh'; then
