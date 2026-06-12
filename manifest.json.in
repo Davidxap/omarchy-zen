@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "Zen Auto Style",
+  "version": "1.0.0",
+  "description": "Reloads Omarchy's generated Zen stylesheet after theme changes.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "@EXTENSION_ID@"
+    }
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "permissions": ["nativeMessaging"],
+  "experiment_apis": {
+    "styleReloader": {
+      "schema": "api/style-reloader/schema.json",
+      "parent": {
+        "scopes": ["addon_parent"],
+        "script": "api/style-reloader/implementation.js",
+        "paths": [["styleReloader"]]
+      }
+    }
+  }
+}

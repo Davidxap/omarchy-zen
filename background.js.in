@@ -1,0 +1,53 @@
+"use strict";
+
+const HOST_NAME = "@NATIVE_HOST_NAME@";
+const RECONNECT_DELAY_MS = 2000;
+
+let port;
+let reconnectTimer;
+
+async function handleMessage(message) {
+  if (message.type !== "stylesheet") {
+    return;
+  }
+
+  try {
+    await browser.styleReloader.replace(message.css);
+    console.info(
+      `Zen Auto Style: loaded ${message.path} (${message.colorScheme})`
+    );
+  } catch (error) {
+    console.error("Zen Auto Style: stylesheet reload failed", error);
+  }
+}
+
+function scheduleReconnect() {
+  if (reconnectTimer) {
+    return;
+  }
+
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null;
+    connect();
+  }, RECONNECT_DELAY_MS);
+}
+
+function connect() {
+  try {
+    port = browser.runtime.connectNative(HOST_NAME);
+    port.onMessage.addListener(handleMessage);
+    port.onDisconnect.addListener(() => {
+      const error = browser.runtime.lastError;
+      if (error) {
+        console.warn(`Zen Auto Style: native host disconnected: ${error.message}`);
+      }
+      port = null;
+      scheduleReconnect();
+    });
+  } catch (error) {
+    console.warn("Zen Auto Style: unable to connect to native host", error);
+    scheduleReconnect();
+  }
+}
+
+connect();

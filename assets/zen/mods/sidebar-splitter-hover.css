@@ -1,0 +1,29 @@
+#sidebar-splitter,
+#zen-sidebar-splitter {
+  --zen-auto-style-splitter-idle: var(--custom-zen-panel);
+  --zen-auto-style-splitter-hover: color-mix(
+    in srgb,
+    white 28%,
+    var(--custom-zen-panel) 72%
+  );
+  border: none !important;
+  opacity: 1 !important;
+  background: var(--zen-auto-style-splitter-idle) !important;
+  background-color: var(--zen-auto-style-splitter-idle) !important;
+  transition:
+    background-color 0.18s ease-in-out,
+    background 0.18s ease-in-out,
+    opacity 0.18s ease-in-out !important;
+}
+
+#sidebar-splitter::before,
+#zen-sidebar-splitter::before {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+#sidebar-splitter:hover,
+#zen-sidebar-splitter:hover {
+  background: var(--zen-auto-style-splitter-hover) !important;
+  background-color: var(--zen-auto-style-splitter-hover) !important;
+}

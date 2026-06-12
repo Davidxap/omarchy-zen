@@ -1,0 +1,7 @@
+{
+  "name": "@NATIVE_HOST_NAME@",
+  "description": "Watches Omarchy's generated Zen stylesheet",
+  "path": "@HOST_PATH@",
+  "type": "stdio",
+  "allowed_extensions": ["@EXTENSION_ID@"]
+}

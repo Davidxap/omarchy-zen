@@ -1,0 +1,4 @@
+#zen-tabbox-wrapper #sidebar-box,
+#tabbrowser-tabbox #tabbrowser-tabpanels .browserSidebarContainer {
+  box-shadow: none !important;
+}

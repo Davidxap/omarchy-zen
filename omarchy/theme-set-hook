@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -e
+
+trigger="$HOME/.cache/zen-auto-style/reload"
+mkdir -p "$(dirname "$trigger")"
+touch "$trigger"

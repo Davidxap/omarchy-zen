@@ -1,0 +1,137 @@
+@import url("custom-zen.css");
+
+/* Keep website content untouched. Only theme internal browser pages here. */
+@-moz-document url-prefix("about:") {
+  :root {
+    color-scheme: var(--custom-zen-color-scheme, dark) !important;
+    --in-content-page-color: var(--custom-zen-fg) !important;
+    --in-content-text-color: var(--custom-zen-fg) !important;
+    --color-accent-primary: var(--custom-zen-accent) !important;
+    --color-accent-primary-hover: var(--custom-zen-accent-hover) !important;
+    --color-accent-primary-active: var(--custom-zen-accent-active) !important;
+    --in-content-page-background: var(--custom-zen-surface-0) !important;
+    --in-content-box-background: var(--custom-zen-surface-1) !important;
+    --link-color: var(--custom-zen-accent) !important;
+    --link-color-hover: var(--custom-zen-accent-hover) !important;
+    --background-color-canvas: var(--custom-zen-surface-0) !important;
+    background-color: var(--custom-zen-surface-0) !important;
+  }
+}
+
+@-moz-document url("about:newtab"), url("about:home") {
+  :root {
+    --newtab-background-color: var(--custom-zen-surface-0) !important;
+    --newtab-background-color-secondary: var(--custom-zen-surface-1)
+      !important;
+    --newtab-element-hover-color: var(--custom-zen-surface-1) !important;
+    --newtab-text-primary-color: var(--custom-zen-fg) !important;
+    --newtab-wordmark-color: var(--custom-zen-fg) !important;
+    --newtab-primary-action-background: var(--custom-zen-accent) !important;
+  }
+
+  .icon {
+    color: var(--custom-zen-accent) !important;
+  }
+
+  .card-outer:is(:hover, :focus, .active):not(.placeholder) .card-title {
+    color: var(--custom-zen-accent) !important;
+  }
+
+  .top-site-outer .search-topsite {
+    background-color: var(--custom-zen-accent) !important;
+  }
+
+  .compact-cards .card-outer .card-context .card-context-icon.icon-download {
+    fill: var(--custom-zen-green) !important;
+  }
+}
+
+@-moz-document url-prefix("about:preferences") {
+  :root {
+    --zen-colors-tertiary: var(--custom-zen-panel) !important;
+    --zen-colors-primary: var(--custom-zen-surface-1) !important;
+    --zen-primary-color: var(--custom-zen-accent) !important;
+  }
+
+  groupbox,
+  moz-card {
+    background: var(--custom-zen-surface-0) !important;
+  }
+
+  .main-content {
+    background-color: var(--custom-zen-bg) !important;
+  }
+
+  .identity-color-blue {
+    --identity-tab-color: var(--custom-zen-blue) !important;
+    --identity-icon-color: var(--custom-zen-blue) !important;
+  }
+
+  .identity-color-turquoise {
+    --identity-tab-color: var(--custom-zen-cyan) !important;
+    --identity-icon-color: var(--custom-zen-cyan) !important;
+  }
+
+  .identity-color-green {
+    --identity-tab-color: var(--custom-zen-green) !important;
+    --identity-icon-color: var(--custom-zen-green) !important;
+  }
+
+  .identity-color-yellow {
+    --identity-tab-color: var(--custom-zen-yellow) !important;
+    --identity-icon-color: var(--custom-zen-yellow) !important;
+  }
+
+  .identity-color-orange {
+    --identity-tab-color: var(--custom-zen-orange) !important;
+    --identity-icon-color: var(--custom-zen-orange) !important;
+  }
+
+  .identity-color-red {
+    --identity-tab-color: var(--custom-zen-red) !important;
+    --identity-icon-color: var(--custom-zen-red) !important;
+  }
+
+  .identity-color-pink {
+    --identity-tab-color: var(--custom-zen-pink) !important;
+    --identity-icon-color: var(--custom-zen-pink) !important;
+  }
+
+  .identity-color-purple {
+    --identity-tab-color: var(--custom-zen-purple) !important;
+    --identity-icon-color: var(--custom-zen-purple) !important;
+  }
+}
+
+@-moz-document url-prefix("about:addons") {
+  :root {
+    --zen-dark-color-mix-base: var(--custom-zen-panel) !important;
+    --background-color-box: var(--custom-zen-surface-0) !important;
+  }
+}
+
+@-moz-document url-prefix("about:protections") {
+  :root {
+    --zen-primary-color: var(--custom-zen-surface-0) !important;
+    --social-color: var(--custom-zen-purple) !important;
+    --cookie-color: var(--custom-zen-cyan) !important;
+    --coockie-color: var(--custom-zen-cyan) !important;
+    --fingerprinter-color: var(--custom-zen-yellow) !important;
+    --cryptominer-color: var(--custom-zen-purple) !important;
+    --tracker-color: var(--custom-zen-green) !important;
+    --in-content-primary-button-background-hover: var(
+      --custom-zen-accent-hover
+    ) !important;
+    --in-content-primary-button-text-color-hover: var(
+      --custom-zen-fg
+    ) !important;
+    --in-content-primary-button-background: var(
+      --custom-zen-accent
+    ) !important;
+    --in-content-primary-button-text-color: var(--custom-zen-bg) !important;
+  }
+
+  .card {
+    background-color: var(--custom-zen-surface-1) !important;
+  }
+}

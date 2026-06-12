@@ -1,0 +1,19 @@
+[
+  {
+    "namespace": "styleReloader",
+    "functions": [
+      {
+        "name": "replace",
+        "type": "function",
+        "description": "Replace the currently registered Omarchy author stylesheet.",
+        "async": true,
+        "parameters": [
+          {
+            "name": "css",
+            "type": "string"
+          }
+        ]
+      }
+    ]
+  }
+]

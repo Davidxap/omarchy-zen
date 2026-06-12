@@ -1,0 +1,134 @@
+@import url("custom-zen.css");
+
+:root {
+  color-scheme: var(--custom-zen-color-scheme, dark) !important;
+  --zen-colors-primary: var(--custom-zen-surface-1) !important;
+  --zen-primary-color: var(--custom-zen-accent) !important;
+  --zen-colors-secondary: var(--custom-zen-surface-1) !important;
+  --zen-colors-tertiary: var(--custom-zen-panel) !important;
+  --zen-colors-border: var(--custom-zen-accent) !important;
+  --toolbarbutton-icon-fill: var(--custom-zen-accent) !important;
+  --lwt-text-color: var(--custom-zen-fg) !important;
+  --toolbar-field-color: var(--custom-zen-fg) !important;
+  --tab-selected-textcolor: var(--custom-zen-accent-hover) !important;
+  --toolbar-field-focus-color: var(--custom-zen-fg) !important;
+  --toolbar-color: var(--custom-zen-fg) !important;
+  --newtab-text-primary-color: var(--custom-zen-fg) !important;
+  --arrowpanel-color: var(--custom-zen-fg) !important;
+  --arrowpanel-background: var(--custom-zen-surface-0) !important;
+  --sidebar-text-color: var(--custom-zen-fg) !important;
+  --lwt-sidebar-text-color: var(--custom-zen-fg) !important;
+  --lwt-sidebar-background-color: var(--custom-zen-bg) !important;
+  --toolbar-bgcolor: var(--custom-zen-surface-1) !important;
+  --newtab-background-color: var(--custom-zen-surface-0) !important;
+  --zen-themed-toolbar-bg: var(--custom-zen-panel) !important;
+  --zen-main-browser-background: var(--custom-zen-panel) !important;
+  --toolbox-bgcolor-inactive: var(--custom-zen-panel) !important;
+}
+
+#permissions-granted-icon {
+  color: var(--custom-zen-panel) !important;
+}
+
+.sidebar-placesTree,
+#zen-workspaces-button,
+.urlbar-background,
+.content-shortcuts {
+  background-color: var(--custom-zen-surface-0) !important;
+}
+
+#TabsToolbar,
+#titlebar,
+#zen-appcontent-navbar-container {
+  background-color: var(--custom-zen-panel) !important;
+}
+
+.content-shortcuts {
+  border-color: var(--custom-zen-accent) !important;
+}
+
+.urlbarView-url {
+  color: var(--custom-zen-accent) !important;
+}
+
+#zenEditBookmarkPanelFaviconContainer {
+  background: var(--custom-zen-bg) !important;
+}
+
+/* Preserve native popup colors instead of Zen's forced dark panel background. */
+menupopup {
+  --panel-background: revert !important;
+}
+
+#zen-media-controls-toolbar #zen-media-progress-bar::-moz-range-track {
+  background: var(--custom-zen-surface-1) !important;
+}
+
+toolbar .toolbarbutton-1:not([disabled]):is([open], [checked])
+  > :is(
+    .toolbarbutton-icon,
+    .toolbarbutton-text,
+    .toolbarbutton-badge-stack
+  ) {
+  fill: var(--custom-zen-bg) !important;
+}
+
+.identity-color-blue {
+  --identity-tab-color: var(--custom-zen-blue) !important;
+  --identity-icon-color: var(--custom-zen-blue) !important;
+}
+
+.identity-color-turquoise {
+  --identity-tab-color: var(--custom-zen-cyan) !important;
+  --identity-icon-color: var(--custom-zen-cyan) !important;
+}
+
+.identity-color-green {
+  --identity-tab-color: var(--custom-zen-green) !important;
+  --identity-icon-color: var(--custom-zen-green) !important;
+}
+
+.identity-color-yellow {
+  --identity-tab-color: var(--custom-zen-yellow) !important;
+  --identity-icon-color: var(--custom-zen-yellow) !important;
+}
+
+.identity-color-orange {
+  --identity-tab-color: var(--custom-zen-orange) !important;
+  --identity-icon-color: var(--custom-zen-orange) !important;
+}
+
+.identity-color-red {
+  --identity-tab-color: var(--custom-zen-red) !important;
+  --identity-icon-color: var(--custom-zen-red) !important;
+}
+
+.identity-color-pink {
+  --identity-tab-color: var(--custom-zen-pink) !important;
+  --identity-icon-color: var(--custom-zen-pink) !important;
+}
+
+.identity-color-purple {
+  --identity-tab-color: var(--custom-zen-purple) !important;
+  --identity-icon-color: var(--custom-zen-purple) !important;
+}
+
+#zen-main-app-wrapper,
+#zen-appcontent-wrapper,
+#zen-sidebar-splitter,
+#zen-browser-background {
+  appearance: unset !important;
+  -moz-default-appearance: none !important;
+}
+
+#zen-main-app-wrapper,
+#zen-appcontent-wrapper,
+#zen-browser-background,
+.zen-browser-generic-background,
+.zen-toolbar-background,
+#navigator-toolbox,
+#tabbrowser-tabbox,
+#main-window {
+  background: var(--custom-zen-panel) !important;
+  background-color: var(--custom-zen-panel) !important;
+}
