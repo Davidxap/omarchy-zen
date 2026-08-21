@@ -1,13 +1,55 @@
 "use strict";
 
 const HOST_NAME = "@NATIVE_HOST_NAME@";
-const RECONNECT_DELAY_MS = 2000;
+const PROTOCOL_VERSION = 1;
+const INITIAL_RECONNECT_MS = 2000;
+const MAX_RECONNECT_MS = 60000;
+const VALID_COLOR_SCHEMES = new Set(["light", "dark"]);
 
 let port;
 let reconnectTimer;
+let reconnectDelay = INITIAL_RECONNECT_MS;
+
+function validateStylesheetMessage(message) {
+  if (message.protocolVersion !== undefined &&
+      message.protocolVersion !== PROTOCOL_VERSION) {
+    console.warn(
+      `Zen Auto Style: protocol version mismatch ` +
+      `(host=${message.protocolVersion}, extension=${PROTOCOL_VERSION})`
+    );
+    // Non-fatal: try to use the payload anyway.
+  }
+
+  if (typeof message.css !== "string" || message.css.trim() === "") {
+    return false;
+  }
+
+  if (message.colorScheme !== undefined &&
+      !VALID_COLOR_SCHEMES.has(message.colorScheme)) {
+    console.warn(
+      `Zen Auto Style: unexpected colorScheme "${message.colorScheme}"`
+    );
+  }
+
+  if (message.path !== undefined && typeof message.path !== "string") {
+    return false;
+  }
+
+  return true;
+}
 
 async function handleMessage(message) {
+  if (message.type === "error") {
+    console.error(`Zen Auto Style: host error: ${message.message}`);
+    return;
+  }
+
   if (message.type !== "stylesheet") {
+    return;
+  }
+
+  if (!validateStylesheetMessage(message)) {
+    console.warn("Zen Auto Style: rejected malformed stylesheet message");
     return;
   }
 
@@ -29,7 +71,10 @@ function scheduleReconnect() {
   reconnectTimer = setTimeout(() => {
     reconnectTimer = null;
     connect();
-  }, RECONNECT_DELAY_MS);
+  }, reconnectDelay);
+
+  // Exponential backoff capped at MAX_RECONNECT_MS.
+  reconnectDelay = Math.min(reconnectDelay * 2, MAX_RECONNECT_MS);
 }
 
 function connect() {

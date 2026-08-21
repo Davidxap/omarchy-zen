@@ -8,10 +8,24 @@ from pathlib import Path
 
 
 HOME = Path.home()
-STYLESHEET = HOME / ".config/omarchy/current/theme/custom-zen.css"
-LIGHT_MODE_MARKER = HOME / ".config/omarchy/current/theme/light.mode"
 TRIGGER = HOME / ".cache/zen-auto-style/reload"
 POLL_INTERVAL_SECONDS = 0.25
+
+OMARCHY_THEME_DIRS = (
+    HOME / ".local/state/omarchy/current/theme",
+    HOME / ".config/omarchy/current/theme",
+)
+
+
+def resolve_theme_dir():
+    """Resolve the Omarchy theme directory for both 4.x and legacy layouts."""
+    for theme_dir in OMARCHY_THEME_DIRS:
+        try:
+            if theme_dir.is_dir():
+                return theme_dir
+        except OSError:
+            pass
+    return OMARCHY_THEME_DIRS[0]
 
 
 def write_message(message):
@@ -29,14 +43,16 @@ def file_signature(path):
         return None
 
 
-def send_stylesheet():
+def send_stylesheet(theme_dir):
+    stylesheet = theme_dir / "custom-zen.css"
+    light_mode_marker = theme_dir / "light.mode"
     try:
-        css = STYLESHEET.read_text(encoding="utf-8")
+        css = stylesheet.read_text(encoding="utf-8")
     except (OSError, UnicodeError) as error:
         write_message({"type": "error", "message": str(error)})
         return
 
-    color_scheme = "light" if LIGHT_MODE_MARKER.is_file() else "dark"
+    color_scheme = "light" if light_mode_marker.is_file() else "dark"
     css += (
         "\n\n:root {\n"
         f"  color-scheme: {color_scheme} !important;\n"
@@ -47,7 +63,7 @@ def send_stylesheet():
     write_message(
         {
             "type": "stylesheet",
-            "path": str(STYLESHEET),
+            "path": str(stylesheet),
             "colorScheme": color_scheme,
             "css": css,
         }
@@ -58,13 +74,17 @@ def main():
     TRIGGER.parent.mkdir(parents=True, exist_ok=True)
     TRIGGER.touch(exist_ok=True)
 
+    theme_dir = resolve_theme_dir()
+    stylesheet = theme_dir / "custom-zen.css"
+    light_mode_marker = theme_dir / "light.mode"
+
     stylesheet_signature = None
     light_mode_signature = None
     trigger_signature = None
 
     while True:
-        next_stylesheet_signature = file_signature(STYLESHEET)
-        next_light_mode_signature = file_signature(LIGHT_MODE_MARKER)
+        next_stylesheet_signature = file_signature(stylesheet)
+        next_light_mode_signature = file_signature(light_mode_marker)
         next_trigger_signature = file_signature(TRIGGER)
 
         if (
@@ -76,7 +96,7 @@ def main():
             light_mode_signature = next_light_mode_signature
             trigger_signature = next_trigger_signature
             if stylesheet_signature is not None:
-                send_stylesheet()
+                send_stylesheet(theme_dir)
 
         time.sleep(POLL_INTERVAL_SECONDS)
 

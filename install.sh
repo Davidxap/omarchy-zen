@@ -243,9 +243,17 @@ ensure_managed_block \
   $'user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);\nuser_pref("extensions.experiments.enabled", true);\nuser_pref("xpinstall.signatures.required", false);'
 
 backup_file "$chrome_dir/custom-zen.css"
-ln -sfn \
-  "$HOME/.config/omarchy/current/theme/custom-zen.css" \
-  "$chrome_dir/custom-zen.css"
+
+# Resolve the Omarchy theme directory for both 4.x (state) and legacy (config)
+if [[ -d "$HOME/.local/state/omarchy/current/theme" ]]; then
+  _theme_custom_css="$HOME/.local/state/omarchy/current/theme/custom-zen.css"
+elif [[ -d "$HOME/.config/omarchy/current/theme" ]]; then
+  _theme_custom_css="$HOME/.config/omarchy/current/theme/custom-zen.css"
+else
+  _theme_custom_css="$HOME/.local/state/omarchy/current/theme/custom-zen.css"
+fi
+
+ln -sfn "$_theme_custom_css" "$chrome_dir/custom-zen.css"
 
 mkdir -p "$HOME/.cache/zen-auto-style"
 touch "$HOME/.cache/zen-auto-style/reload"
