@@ -29,6 +29,11 @@ find_zen_profile() {
   local profile_path
 
   if [[ -n ${ZEN_PROFILE:-} ]]; then
+    if [[ ! -d $ZEN_PROFILE ]]; then
+      echo "ZEN_PROFILE does not exist: $ZEN_PROFILE" >&2
+      echo "Start the browser once, or remove the override to use auto-discovery." >&2
+      return 1
+    fi
     printf '%s\n' "$ZEN_PROFILE"
     return
   fi
@@ -67,6 +72,45 @@ find_zen_profile() {
     fi
   fi
 
+  # Fallback: try legacy ~/.zen root (old Zen installs, zen-browser-bin)
+  local legacy_root="$HOME/.zen"
+  if [[ "$zen_root" != "$legacy_root" && -d "$legacy_root" ]]; then
+    local legacy_installs="$legacy_root/installs.ini"
+    local legacy_profiles="$legacy_root/profiles.ini"
+    if [[ -f $legacy_installs ]]; then
+      profile_path="$(
+        awk -F= '
+          $1 == "Default" {
+            value = substr($0, index($0, "=") + 1)
+            if (value != "") {
+              print value
+              exit
+            }
+          }
+        ' "$legacy_installs"
+      )"
+      if [[ -n $profile_path && -d $legacy_root/$profile_path ]]; then
+        printf '%s\n' "$legacy_root/$profile_path"
+        return
+      fi
+    fi
+    if [[ -f $legacy_profiles ]]; then
+      profile_path="$(
+        awk -F= '
+          $1 == "Path" { path = substr($0, index($0, "=") + 1) }
+          $1 == "Default" && $2 == "1" && path != "" {
+            print path
+            exit
+          }
+        ' "$legacy_profiles"
+      )"
+      if [[ -n $profile_path && -d $legacy_root/$profile_path ]]; then
+        printf '%s\n' "$legacy_root/$profile_path"
+        return
+      fi
+    fi
+  fi
+
   return 1
 }
 
@@ -79,36 +123,46 @@ backup_file() {
   fi
 }
 
-ensure_import() {
+ensure_managed_block() {
   local target=$1
-  local import=$2
+  local begin_marker=$2
+  local end_marker=$3
+  local content=$4
   local temporary
 
   touch "$target"
-  if grep -Fqx "$import" "$target"; then
-    return
-  fi
+  backup_file "$target"
+  temporary="$(mktemp)"
+
+  awk \
+    -v begin="$begin_marker" \
+    -v end="$end_marker" '
+      $0 == begin { managed = 1; next }
+      $0 == end { managed = 0; next }
+      !managed { print }
+    ' "$target" >"$temporary"
+
+  {
+    printf '%s\n%s\n%s\n\n' "$begin_marker" "$content" "$end_marker"
+    cat "$temporary"
+  } >"$temporary.new"
+
+  mv "$temporary.new" "$target"
+  rm -f "$temporary"
+}
+
+remove_legacy_line() {
+  local target=$1
+  local line=$2
+  local temporary
+
+  [[ -f $target ]] || return 0
+  grep -Fqx "$line" "$target" || return 0
 
   backup_file "$target"
   temporary="$(mktemp)"
-  {
-    printf '%s\n\n' "$import"
-    cat "$target"
-  } >"$temporary"
+  grep -Fvx "$line" "$target" >"$temporary" || true
   mv "$temporary" "$target"
-}
-
-ensure_user_pref() {
-  local target=$1
-  local preference='user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);'
-
-  touch "$target"
-  if grep -Fqx "$preference" "$target"; then
-    return
-  fi
-
-  backup_file "$target"
-  printf '\n%s\n' "$preference" >>"$target"
 }
 
 mod_is_available() {
@@ -202,21 +256,48 @@ done
   done
 } >"$chrome_dir/zen-auto-style-mods.css"
 
-ensure_import \
+remove_legacy_line \
   "$chrome_dir/userChrome.css" \
   '@import url("zen-auto-style-chrome.css");'
-ensure_import \
+remove_legacy_line \
   "$chrome_dir/userChrome.css" \
   '@import url("zen-auto-style-mods.css");'
-ensure_import \
+remove_legacy_line \
   "$chrome_dir/userContent.css" \
   '@import url("zen-auto-style-content.css");'
-ensure_user_pref "$zen_profile/user.js"
+
+ensure_managed_block \
+  "$chrome_dir/userChrome.css" \
+  '/* BEGIN ZEN AUTO STYLE */' \
+  '/* END ZEN AUTO STYLE */' \
+  $'@import url("zen-auto-style-chrome.css");\n@import url("zen-auto-style-mods.css");'
+ensure_managed_block \
+  "$chrome_dir/userContent.css" \
+  '/* BEGIN ZEN AUTO STYLE */' \
+  '/* END ZEN AUTO STYLE */' \
+  '@import url("zen-auto-style-content.css");'
+
+remove_legacy_line \
+  "$zen_profile/user.js" \
+  'user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);'
+ensure_managed_block \
+  "$zen_profile/user.js" \
+  '// BEGIN ZEN AUTO STYLE' \
+  '// END ZEN AUTO STYLE' \
+  $'user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);\nuser_pref("extensions.experiments.enabled", true);\nuser_pref("xpinstall.signatures.required", false);'
 
 backup_file "$chrome_dir/custom-zen.css"
-ln -sfn \
-  "$HOME/.config/omarchy/current/theme/custom-zen.css" \
-  "$chrome_dir/custom-zen.css"
+
+# Resolve the Omarchy theme directory for both 4.x (state) and legacy (config)
+if [[ -d "$HOME/.local/state/omarchy/current/theme" ]]; then
+  _theme_custom_css="$HOME/.local/state/omarchy/current/theme/custom-zen.css"
+elif [[ -d "$HOME/.config/omarchy/current/theme" ]]; then
+  _theme_custom_css="$HOME/.config/omarchy/current/theme/custom-zen.css"
+else
+  _theme_custom_css="$HOME/.local/state/omarchy/current/theme/custom-zen.css"
+fi
+
+ln -sfn "$_theme_custom_css" "$chrome_dir/custom-zen.css"
 
 mkdir -p "$HOME/.cache/zen-auto-style"
 touch "$HOME/.cache/zen-auto-style/reload"
