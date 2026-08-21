@@ -3,13 +3,16 @@
 set -euo pipefail
 
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-build_dir="$project_dir/build"
-host_dir="$HOME/.local/lib/zen-auto-style"
-manifest_dir="$HOME/.mozilla/native-messaging-hosts"
 hook_dir="$HOME/.config/omarchy/hooks/theme-set.d"
 template_dir="$HOME/.config/omarchy/themed"
-zen_root="${ZEN_CONFIG_DIR:-$HOME/.config/zen}"
-backup_root="$HOME/.local/state/zen-auto-style/backups/$(date +%Y%m%d-%H%M%S-%N)-$$"
+if [[ -n ${ZEN_CONFIG_DIR:-} ]]; then
+  zen_root="$ZEN_CONFIG_DIR"
+elif [[ -d "$HOME/.zen" ]]; then
+  zen_root="$HOME/.zen"
+else
+  zen_root="$HOME/.config/zen"
+fi
+backup_root="$HOME/.local/state/zen-auto-style/backups/$(date +%Y%m%d-%H%M%S-%N)-$$)"
 available_mods=(
   compact-rounded-content
   flat-sidebar
@@ -17,18 +20,17 @@ available_mods=(
   unloaded-tabs
 )
 
-"$project_dir/build.sh"
-
-# shellcheck source=/dev/null
-source "$build_dir/generated.conf"
-native_manifest="$manifest_dir/$NATIVE_HOST_NAME.json"
-
 find_zen_profile() {
   local installs_file="$zen_root/installs.ini"
   local profiles_file="$zen_root/profiles.ini"
   local profile_path
 
   if [[ -n ${ZEN_PROFILE:-} ]]; then
+    if [[ ! -d $ZEN_PROFILE ]]; then
+      echo "ZEN_PROFILE does not exist: $ZEN_PROFILE" >&2
+      echo "Start the browser once, or remove the override to use auto-discovery." >&2
+      return 1
+    fi
     printf '%s\n' "$ZEN_PROFILE"
     return
   fi
@@ -156,25 +158,9 @@ zen_profile="$(find_zen_profile)" || {
 chrome_dir="$zen_profile/chrome"
 
 mkdir -p \
-  "$host_dir" \
-  "$manifest_dir" \
   "$hook_dir" \
   "$template_dir" \
   "$chrome_dir"
-
-install -m 755 \
-  "$project_dir/native/zen-auto-style-host.py" \
-  "$host_dir/zen-auto-style-host.py"
-install -m 644 \
-  "$build_dir/generated.conf" \
-  "$host_dir/generated.conf"
-
-sed \
-  -e "s|@HOST_PATH@|$host_dir/zen-auto-style-host.py|g" \
-  -e "s|@EXTENSION_ID@|$EXTENSION_ID|g" \
-  -e "s|@NATIVE_HOST_NAME@|$NATIVE_HOST_NAME|g" \
-  "$project_dir/native/native-host.json.in" \
-  >"$native_manifest"
 
 install -m 755 \
   "$project_dir/omarchy/theme-set-hook" \
@@ -233,6 +219,16 @@ ensure_managed_block \
   '/* END ZEN AUTO STYLE */' \
   '@import url("zen-auto-style-content.css");'
 
+# Remove dangerous prefs left over from the legacy extension-based install.
+remove_legacy_line \
+  "$zen_profile/user.js" \
+  'user_pref("extensions.experiments.enabled", true);'
+remove_legacy_line \
+  "$zen_profile/user.js" \
+  'user_pref("xpinstall.signatures.required", false);'
+
+# Only toolkit.legacyUserProfileCustomizations.stylesheets is needed for
+# userChrome.css to work. No experiment_apis, no signature bypass.
 remove_legacy_line \
   "$zen_profile/user.js" \
   'user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);'
@@ -240,7 +236,7 @@ ensure_managed_block \
   "$zen_profile/user.js" \
   '// BEGIN ZEN AUTO STYLE' \
   '// END ZEN AUTO STYLE' \
-  $'user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);\nuser_pref("extensions.experiments.enabled", true);\nuser_pref("xpinstall.signatures.required", false);'
+  'user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);'
 
 backup_file "$chrome_dir/custom-zen.css"
 
@@ -255,8 +251,10 @@ fi
 
 ln -sfn "$_theme_custom_css" "$chrome_dir/custom-zen.css"
 
-mkdir -p "$HOME/.cache/zen-auto-style"
-touch "$HOME/.cache/zen-auto-style/reload"
+# Clean up legacy extension and native host artifacts from previous installs.
+rm -rf "$HOME/.local/lib/zen-auto-style"
+rm -f "$HOME/.mozilla/native-messaging-hosts/org.omarchy.zen_auto_style.json"
+rm -rf "$HOME/.cache/zen-auto-style"
 
 if command -v omarchy >/dev/null 2>&1; then
   omarchy theme refresh
@@ -265,9 +263,7 @@ else
 fi
 
 echo "Installed Zen CSS into: $zen_profile"
-echo "Installed Omarchy template, native host, and theme hook."
-echo "Extension ID: $EXTENSION_ID"
-echo "Native host: $NATIVE_HOST_NAME"
+echo "Installed Omarchy template and theme hook."
 if (( ${#selected_mods[@]} )); then
   echo "Optional Zen mods: ${selected_mods[*]}"
 else
@@ -276,4 +272,4 @@ fi
 if [[ -d $backup_root ]]; then
   echo "Backups: $backup_root"
 fi
-echo "Install build/zen-auto-style.xpi in Zen, then restart Zen once."
+echo "Restart Zen once to pick up the themed CSS."

@@ -1,7 +1,11 @@
 #!/bin/bash
 
-set -e
-
-trigger="$HOME/.cache/zen-auto-style/reload"
-mkdir -p "$(dirname "$trigger")"
-touch "$trigger"
+# Zen Auto Style theme-set hook.
+#
+# Omarchy renders custom-zen.css.tpl into custom-zen.css BEFORE running
+# theme-set hooks, and the chrome/ symlink already points to it. So there
+# is nothing to do here — Zen will pick up the updated CSS on next restart.
+#
+# This hook exists so that future enhancements (e.g. notifications, live
+# reload signals) can be added without touching install.sh.
+true

@@ -3,8 +3,13 @@
 set -euo pipefail
 
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-installed_config="$HOME/.local/lib/zen-auto-style/generated.conf"
-zen_root="${ZEN_CONFIG_DIR:-$HOME/.config/zen}"
+if [[ -n ${ZEN_CONFIG_DIR:-} ]]; then
+  zen_root="$ZEN_CONFIG_DIR"
+elif [[ -d "$HOME/.zen" ]]; then
+  zen_root="$HOME/.zen"
+else
+  zen_root="$HOME/.config/zen"
+fi
 
 find_zen_profile() {
   local installs_file="$zen_root/installs.ini"
@@ -12,6 +17,10 @@ find_zen_profile() {
   local profile_path
 
   if [[ -n ${ZEN_PROFILE:-} ]]; then
+    if [[ ! -d $ZEN_PROFILE ]]; then
+      echo "ZEN_PROFILE does not exist: $ZEN_PROFILE" >&2
+      return 1
+    fi
     printf '%s\n' "$ZEN_PROFILE"
     return
   fi
@@ -69,17 +78,6 @@ remove_exact_line() {
   mv "$temporary" "$target"
 }
 
-if [[ -f $installed_config ]]; then
-  # shellcheck source=/dev/null
-  source "$installed_config"
-  native_host_name="$NATIVE_HOST_NAME"
-else
-  # shellcheck source=project.conf
-  source "$project_dir/project.conf"
-  native_host_name="${ZEN_AUTO_STYLE_NATIVE_HOST_NAME:-$NATIVE_HOST_NAME}"
-fi
-
-rm -f "$HOME/.mozilla/native-messaging-hosts/$native_host_name.json"
 rm -f "$HOME/.config/omarchy/hooks/theme-set.d/zen-auto-style"
 
 if zen_profile="$(find_zen_profile)"; then
@@ -115,8 +113,11 @@ if [[ -f $template ]] && cmp -s "$template" "$project_dir/assets/omarchy/custom-
   rm -f "$template"
 fi
 
+# Clean up all legacy artifacts from the old extension-based install.
 rm -rf "$HOME/.local/lib/zen-auto-style"
+rm -f "$HOME/.mozilla/native-messaging-hosts/org.omarchy.zen_auto_style.json"
 rm -rf "$HOME/.cache/zen-auto-style"
 
-echo "Removed Zen Auto Style's native host, Omarchy hook, browser imports, and managed files."
+echo "Removed Zen Auto Style's Omarchy hook, browser imports, and managed files."
+echo "Legacy native host and extension artifacts cleaned up."
 echo "User-owned CSS outside the managed blocks was preserved."

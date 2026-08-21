@@ -1,4 +1,5 @@
 :root {
+  --custom-zen-color-scheme: {{ mode }};
   --custom-zen-bg: {{ background }};
   --custom-zen-fg: {{ foreground }};
   --custom-zen-accent: {{ accent }};
