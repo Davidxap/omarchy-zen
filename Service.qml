@@ -46,7 +46,12 @@ Item {
     // Ensures the bridge is installed. Safe to re-run — install.sh is idempotent.
     function ensureInstalled() {
         if (installer.running) return
-        installer.command = ["bash", installScript]
+        // Wrap execution with streaming byte caps (tail -c) per stream
+        // so that arbitrarily large newline-free records from hooks or
+        // omarchy theme refresh cannot grow the long-lived shell memory.
+        installer.command = ["bash", "-c",
+          'exec bash "$0" > >(tail -c 8192) 2> >(tail -c 8192)',
+          installScript]
         installer.running = true
     }
 

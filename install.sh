@@ -267,7 +267,9 @@ rm -f "$HOME/.mozilla/native-messaging-hosts/org.omarchy.zen_auto_style.json"
 rm -rf "$HOME/.cache/zen-auto-style"
 
 if command -v omarchy >/dev/null 2>&1; then
-  omarchy theme refresh
+  if ! omarchy theme refresh >/dev/null 2>&1; then
+    echo "Warning: 'omarchy theme refresh' failed; run it manually." >&2
+  fi
 else
   echo "Warning: omarchy is not on PATH; run 'omarchy theme refresh' later." >&2
 fi
