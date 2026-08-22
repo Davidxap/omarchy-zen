@@ -160,3 +160,26 @@ toolbar .toolbarbutton-1:not([disabled]):is([open], [checked])
   background: var(--custom-zen-panel, #16161e) !important;
   background-color: var(--custom-zen-panel, #16161e) !important;
 }
+
+/* Unified sidebar — removes the 1px top gap that appears as black/white
+ * depending on theme. Zen uses --zen-element-separation for spacing; stock
+ * leaves a hairline where the toolbox meets the sidebar. Force the sidebar
+ * and its containers to the same panel background with no border/margin. */
+#zen-sidebar-box,
+#sidebar-box,
+#zen-tabbox-wrapper,
+#tabbrowser-tabbox,
+#navigator-toolbox {
+  background: var(--custom-zen-panel, #16161e) !important;
+  background-color: var(--custom-zen-panel, #16161e) !important;
+  border: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#navigator-toolbox {
+  border-bottom: none !important;
+}
