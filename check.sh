@@ -20,6 +20,8 @@ bash -n \
   "$project_dir/check.sh" \
   "$project_dir/install.sh" \
   "$project_dir/uninstall.sh" \
+  "$project_dir/test-fresh-install.sh" \
+  "$project_dir/verify.sh" \
   "$project_dir/omarchy/theme-set-hook"
 
 if rg -n 'YOUR-USER|TODO|FIXME|youremail' \

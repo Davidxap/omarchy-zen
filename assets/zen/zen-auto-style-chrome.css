@@ -1,58 +1,80 @@
 @import url("custom-zen.css");
 
+/*
+ * Robustness strategy:
+ *
+ * 1. Every var() carries a fallback so a broken symlink, an unrendered
+ *    Omarchy template, or a missing variable degrades to a sensible dark
+ *    palette instead of producing invalid CSS that the browser ignores.
+ *
+ * 2. Zen's public color variables (--zen-colors-*) are set in :root with
+ *    !important so they cascade to every element regardless of which
+ *    internal selector Zen uses to consume them. If Zen renames a variable
+ *    the :root line becomes a no-op (harmless) and the element-level rules
+ *    below still apply the color directly.
+ *
+ * 3. Firefox toolkit variables (--toolbar-bgcolor, --lwt-text-color, etc.)
+ *    are mapped in parallel so that if Zen's variable layer changes, the
+ *    toolkit layer — which has been stable for 15+ years — still carries
+ *    the theme.
+ */
 :root {
   color-scheme: var(--custom-zen-color-scheme, dark) !important;
-  --zen-colors-primary: var(--custom-zen-surface-1) !important;
-  --zen-primary-color: var(--custom-zen-accent) !important;
-  --zen-colors-secondary: var(--custom-zen-surface-1) !important;
-  --zen-colors-tertiary: var(--custom-zen-panel) !important;
-  --zen-colors-border: var(--custom-zen-accent) !important;
-  --toolbarbutton-icon-fill: var(--custom-zen-accent) !important;
-  --lwt-text-color: var(--custom-zen-fg) !important;
-  --toolbar-field-color: var(--custom-zen-fg) !important;
-  --tab-selected-textcolor: var(--custom-zen-accent-hover) !important;
-  --toolbar-field-focus-color: var(--custom-zen-fg) !important;
-  --toolbar-color: var(--custom-zen-fg) !important;
-  --newtab-text-primary-color: var(--custom-zen-fg) !important;
-  --arrowpanel-color: var(--custom-zen-fg) !important;
-  --arrowpanel-background: var(--custom-zen-surface-0) !important;
-  --sidebar-text-color: var(--custom-zen-fg) !important;
-  --lwt-sidebar-text-color: var(--custom-zen-fg) !important;
-  --lwt-sidebar-background-color: var(--custom-zen-bg) !important;
-  --toolbar-bgcolor: var(--custom-zen-surface-1) !important;
-  --newtab-background-color: var(--custom-zen-surface-0) !important;
-  --zen-themed-toolbar-bg: var(--custom-zen-panel) !important;
-  --zen-main-browser-background: var(--custom-zen-panel) !important;
-  --toolbox-bgcolor-inactive: var(--custom-zen-panel) !important;
+
+  /* --- Zen public color API (primary theming surface) --- */
+  --zen-colors-primary: var(--custom-zen-surface-1, #24283b) !important;
+  --zen-primary-color: var(--custom-zen-accent, #7aa2f7) !important;
+  --zen-colors-secondary: var(--custom-zen-surface-1, #24283b) !important;
+  --zen-colors-tertiary: var(--custom-zen-panel, #16161e) !important;
+  --zen-colors-border: var(--custom-zen-accent, #7aa2f7) !important;
+  --zen-themed-toolbar-bg: var(--custom-zen-panel, #16161e) !important;
+  --zen-main-browser-background: var(--custom-zen-panel, #16161e) !important;
+  --toolbox-bgcolor-inactive: var(--custom-zen-panel, #16161e) !important;
+
+  /* --- Firefox toolkit variables (stable, 15+ year API) --- */
+  --toolbarbutton-icon-fill: var(--custom-zen-accent, #7aa2f7) !important;
+  --lwt-text-color: var(--custom-zen-fg, #c0caf5) !important;
+  --toolbar-field-color: var(--custom-zen-fg, #c0caf5) !important;
+  --tab-selected-textcolor: var(--custom-zen-accent-hover, #89b4fa) !important;
+  --toolbar-field-focus-color: var(--custom-zen-fg, #c0caf5) !important;
+  --toolbar-color: var(--custom-zen-fg, #c0caf5) !important;
+  --newtab-text-primary-color: var(--custom-zen-fg, #c0caf5) !important;
+  --arrowpanel-color: var(--custom-zen-fg, #c0caf5) !important;
+  --arrowpanel-background: var(--custom-zen-surface-0, #1a1b26) !important;
+  --sidebar-text-color: var(--custom-zen-fg, #c0caf5) !important;
+  --lwt-sidebar-text-color: var(--custom-zen-fg, #c0caf5) !important;
+  --lwt-sidebar-background-color: var(--custom-zen-bg, #1a1b26) !important;
+  --toolbar-bgcolor: var(--custom-zen-surface-1, #24283b) !important;
+  --newtab-background-color: var(--custom-zen-surface-0, #1a1b26) !important;
 }
 
 #permissions-granted-icon {
-  color: var(--custom-zen-panel) !important;
+  color: var(--custom-zen-panel, #16161e) !important;
 }
 
 .sidebar-placesTree,
 #zen-workspaces-button,
 .urlbar-background,
 .content-shortcuts {
-  background-color: var(--custom-zen-surface-0) !important;
+  background-color: var(--custom-zen-surface-0, #1a1b26) !important;
 }
 
 #TabsToolbar,
 #titlebar,
 #zen-appcontent-navbar-container {
-  background-color: var(--custom-zen-panel) !important;
+  background-color: var(--custom-zen-panel, #16161e) !important;
 }
 
 .content-shortcuts {
-  border-color: var(--custom-zen-accent) !important;
+  border-color: var(--custom-zen-accent, #7aa2f7) !important;
 }
 
 .urlbarView-url {
-  color: var(--custom-zen-accent) !important;
+  color: var(--custom-zen-accent, #7aa2f7) !important;
 }
 
 #zenEditBookmarkPanelFaviconContainer {
-  background: var(--custom-zen-bg) !important;
+  background: var(--custom-zen-bg, #1a1b26) !important;
 }
 
 /* Preserve native popup colors instead of Zen's forced dark panel background. */
@@ -61,7 +83,7 @@ menupopup {
 }
 
 #zen-media-controls-toolbar #zen-media-progress-bar::-moz-range-track {
-  background: var(--custom-zen-surface-1) !important;
+  background: var(--custom-zen-surface-1, #24283b) !important;
 }
 
 toolbar .toolbarbutton-1:not([disabled]):is([open], [checked])
@@ -70,49 +92,55 @@ toolbar .toolbarbutton-1:not([disabled]):is([open], [checked])
     .toolbarbutton-text,
     .toolbarbutton-badge-stack
   ) {
-  fill: var(--custom-zen-bg) !important;
+  fill: var(--custom-zen-bg, #1a1b26) !important;
 }
 
 .identity-color-blue {
-  --identity-tab-color: var(--custom-zen-blue) !important;
-  --identity-icon-color: var(--custom-zen-blue) !important;
+  --identity-tab-color: var(--custom-zen-blue, #7aa2f7) !important;
+  --identity-icon-color: var(--custom-zen-blue, #7aa2f7) !important;
 }
 
 .identity-color-turquoise {
-  --identity-tab-color: var(--custom-zen-cyan) !important;
-  --identity-icon-color: var(--custom-zen-cyan) !important;
+  --identity-tab-color: var(--custom-zen-cyan, #7dcfff) !important;
+  --identity-icon-color: var(--custom-zen-cyan, #7dcfff) !important;
 }
 
 .identity-color-green {
-  --identity-tab-color: var(--custom-zen-green) !important;
-  --identity-icon-color: var(--custom-zen-green) !important;
+  --identity-tab-color: var(--custom-zen-green, #9ece6a) !important;
+  --identity-icon-color: var(--custom-zen-green, #9ece6a) !important;
 }
 
 .identity-color-yellow {
-  --identity-tab-color: var(--custom-zen-yellow) !important;
-  --identity-icon-color: var(--custom-zen-yellow) !important;
+  --identity-tab-color: var(--custom-zen-yellow, #e0af68) !important;
+  --identity-icon-color: var(--custom-zen-yellow, #e0af68) !important;
 }
 
 .identity-color-orange {
-  --identity-tab-color: var(--custom-zen-orange) !important;
-  --identity-icon-color: var(--custom-zen-orange) !important;
+  --identity-tab-color: var(--custom-zen-orange, #ff9e64) !important;
+  --identity-icon-color: var(--custom-zen-orange, #ff9e64) !important;
 }
 
 .identity-color-red {
-  --identity-tab-color: var(--custom-zen-red) !important;
-  --identity-icon-color: var(--custom-zen-red) !important;
+  --identity-tab-color: var(--custom-zen-red, #f7768e) !important;
+  --identity-icon-color: var(--custom-zen-red, #f7768e) !important;
 }
 
 .identity-color-pink {
-  --identity-tab-color: var(--custom-zen-pink) !important;
-  --identity-icon-color: var(--custom-zen-pink) !important;
+  --identity-tab-color: var(--custom-zen-pink, #bb9af7) !important;
+  --identity-icon-color: var(--custom-zen-pink, #bb9af7) !important;
 }
 
 .identity-color-purple {
-  --identity-tab-color: var(--custom-zen-purple) !important;
-  --identity-icon-color: var(--custom-zen-purple) !important;
+  --identity-tab-color: var(--custom-zen-purple, #9d7cd8) !important;
+  --identity-icon-color: var(--custom-zen-purple, #9d7cd8) !important;
 }
 
+/*
+ * Background coverage. These selectors target Zen-specific wrappers. If a
+ * future Zen version renames any of them, the :root variable mappings above
+ * already provide the correct color through the cascade, so this block is
+ * supplementary reinforcement, not the primary theming mechanism.
+ */
 #zen-main-app-wrapper,
 #zen-appcontent-wrapper,
 #zen-sidebar-splitter,
@@ -129,6 +157,6 @@ toolbar .toolbarbutton-1:not([disabled]):is([open], [checked])
 #navigator-toolbox,
 #tabbrowser-tabbox,
 #main-window {
-  background: var(--custom-zen-panel) !important;
-  background-color: var(--custom-zen-panel) !important;
+  background: var(--custom-zen-panel, #16161e) !important;
+  background-color: var(--custom-zen-panel, #16161e) !important;
 }

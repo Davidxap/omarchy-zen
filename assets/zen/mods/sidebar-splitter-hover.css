@@ -1,10 +1,10 @@
 #sidebar-splitter,
 #zen-sidebar-splitter {
-  --zen-auto-style-splitter-idle: var(--custom-zen-panel);
+  --zen-auto-style-splitter-idle: var(--custom-zen-panel, #16161e);
   --zen-auto-style-splitter-hover: color-mix(
     in srgb,
     white 28%,
-    var(--custom-zen-panel) 72%
+    var(--custom-zen-panel, #16161e) 72%
   );
   border: none !important;
   opacity: 1 !important;

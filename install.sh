@@ -114,7 +114,7 @@ remove_legacy_line() {
   local line=$2
   local temporary
 
-  [[ -f $target ]] || return
+  [[ -f $target ]] || return 0
   grep -Fqx "$line" "$target" || return 0
 
   backup_file "$target"
@@ -220,11 +220,21 @@ ensure_managed_block \
   '@import url("zen-auto-style-content.css");'
 
 # Remove dangerous prefs left over from the legacy extension-based install.
+#
+# prefs.js is the file Zen actually reads at runtime. user.js is only applied
+# on startup and then merged into prefs.js, so cleaning user.js alone leaves
+# the dangerous values active. Clean BOTH files.
 remove_legacy_line \
   "$zen_profile/user.js" \
   'user_pref("extensions.experiments.enabled", true);'
 remove_legacy_line \
   "$zen_profile/user.js" \
+  'user_pref("xpinstall.signatures.required", false);'
+remove_legacy_line \
+  "$zen_profile/prefs.js" \
+  'user_pref("extensions.experiments.enabled", true);'
+remove_legacy_line \
+  "$zen_profile/prefs.js" \
   'user_pref("xpinstall.signatures.required", false);'
 
 # Only toolkit.legacyUserProfileCustomizations.stylesheets is needed for
