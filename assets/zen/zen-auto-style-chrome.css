@@ -183,3 +183,30 @@ toolbar .toolbarbutton-1:not([disabled]):is([open], [checked])
 #navigator-toolbox {
   border-bottom: none !important;
 }
+
+/* Only sidebar / sidebar+top toolbar — gap between sidebar and content
+ * shows as white (light) or black (dark) because the underlying window
+ * background leaks through the flex gap. Cover the root browser containers
+ * and force the gap area to panel color. This is the white/black line
+ * reported in those two layout modes. */
+html,
+body,
+#browser,
+#appcontent,
+#tabbrowser-tabbox,
+#zen-main-app-wrapper,
+#zen-appcontent-wrapper,
+#zen-browser-background {
+  background: var(--custom-zen-panel, #16161e) !important;
+  background-color: var(--custom-zen-panel, #16161e) !important;
+}
+
+/* Ensure the flex gap inherits panel color, not window chrome.
+ * Do NOT force gap:0 — compact-rounded-content needs 8px separation.
+ * The white/black line was the window background leaking through; now
+ * the wrapper is panel-colored so the gap reads as panel. */
+#zen-sidebar-splitter {
+  background: var(--custom-zen-panel, #16161e) !important;
+  border: none !important;
+  min-width: 1px !important;
+}
