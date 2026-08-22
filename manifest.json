@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.davidxap.omarchy-zen",
   "name": "Omarchy Zen",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "David Arturo Arroyave Pérez",
   "license": "MIT",
   "description": "Syncs Omarchy's Pywal palette into Zen Browser — pure CSS, no extension. Auto-updates on theme switch, survives Zen updates.",

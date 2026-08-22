@@ -31,6 +31,18 @@ Item {
         try { return decodeURIComponent(v) } catch (e) { return v }
     }
 
+    // Bounded capture of installer output to prevent unbounded memory growth
+    // in the long-lived Quickshell process. Keeps only the last N lines.
+    property string installerOutTail: ""
+    property string installerErrTail: ""
+
+    function pushTail(buffer, line, maxLines) {
+        var lines = (buffer.length ? buffer.split("\n") : [])
+        lines.push(line)
+        while (lines.length > maxLines) lines.shift()
+        return lines.join("\n")
+    }
+
     // Ensures the bridge is installed. Safe to re-run — install.sh is idempotent.
     function ensureInstalled() {
         if (installer.running) return
@@ -44,13 +56,23 @@ Item {
     // notification via qs.Commons.
     Process {
         id: installer
-        stdout: StdioCollector { id: installerOut; waitForEnd: true }
-        stderr: StdioCollector { id: installerErr; waitForEnd: true }
-        onExited: function(exitCode, exitStatus) {
+        property string outTail: root.installerOutTail
+        property string errTail: root.installerErrTail
+        stdout: SplitParser {
+            onRead: function(line) {
+                root.installerOutTail = root.pushTail(root.installerOutTail, String(line), 8)
+            }
+        }
+        stderr: SplitParser {
+            onRead: function(line) {
+                root.installerErrTail = root.pushTail(root.installerErrTail, String(line), 8)
+            }
+        }
+        onExited: function(exitCode) {
             if (exitCode !== 0) {
-                console.warn("Omarchy Zen: install.sh failed (" + exitCode + "): " + installerErr.text.trim())
+                console.warn("Omarchy Zen: install.sh failed (" + exitCode + "): " + root.installerErrTail.trim())
             } else {
-                var out = installerOut.text.trim()
+                var out = root.installerOutTail.trim()
                 if (out.length > 0) console.log("Omarchy Zen: " + out.split("\n").slice(-2).join(" — "))
             }
         }
