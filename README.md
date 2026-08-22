@@ -4,17 +4,15 @@ Syncs Omarchy's Pywal palette into Zen Browser — pure CSS, no extension, no na
 
 > **Based on [gstrand99/zen-auto-style](https://github.com/gstrand99/zen-auto-style)** by Gregory Strand (MIT). This project evolves that work into a maintained Omarchy plugin (`io.github.davidxap.omarchy-zen`) with a hardened CSS-only approach. The original extension implementation is preserved in [`legacy/`](legacy/).
 
-![Omarchy Zen preview](preview.png)
-
 ## Screenshots
 
-Zen `about:preferences` themed via Omarchy — same palette as your desktop, no extension.
+Zen Browser with Omarchy themes — same Pywal palette on desktop and browser, unified sidebar (gap fixed).
 
-| Flexoki Light + Zen | Catppuccin + Zen | Details |
-|---|---|---|
-| ![Zen Flexoki](screenshots/zen-omarchy-settings-1.png) | ![Zen Catppuccin](screenshots/zen-omarchy-settings-2.png) | ![Zen Settings](screenshots/zen-omarchy-settings-3.png) |
+| Flexoki Light | Catppuccin |
+|---|---|
+| ![Flexoki Light](screenshots/comparative-light.png) | ![Catppuccin](screenshots/comparative-dark.png) |
 
-> Captures: 2560×1440, Zen with `custom-zen.css` symlinked to `~/.local/state/omarchy/current/theme/custom-zen.css`. Restart Zen after `omarchy theme set` to apply.
+> Captures with fix `3aa1045` (unified sidebar, no 1px gap). Zen `custom-zen.css` symlinked to `~/.local/state/omarchy/current/theme/custom-zen.css`. Restart Zen after `omarchy theme set`.
 
 ## Why Omarchy Zen?
 
