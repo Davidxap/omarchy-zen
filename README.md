@@ -116,9 +116,9 @@ Removes hook, managed imports, pref (preserving user CSS outside blocks), templa
 
 Unlike the old XPI, CSS-only **requires a Zen restart** after `omarchy theme set`. The symlink updates instantly, but Zen only reloads `userChrome.css` on startup. This is intentional for security and update-resilience.
 
-## Legacy
+## Legacy (live reload without restart)
 
-Original XPI + Python host in [`legacy/`](legacy/) — not installed, kept for reference. See `legacy/README.md`.
+Original XPI + Python host in [`legacy/`](legacy/) — not installed by default, kept for reference and updated for Omarchy 4.x / Quattro. If you prefer live reload without restarting Zen, use the legacy build (requires `xpinstall.signatures.required=false` + `extensions.experiments.enabled=true`). See `legacy/README.md`.
 
 ## Credits
 
