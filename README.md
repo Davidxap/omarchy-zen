@@ -6,13 +6,15 @@ Syncs Omarchy's Pywal palette into Zen Browser — pure CSS, no extension, no na
 
 ## Screenshots
 
-Zen Browser with Omarchy themes — same Pywal palette on desktop and browser, unified sidebar (gap fixed).
+Zen Browser + desktop — same Pywal palette, unified (no white/black gap). Fix `bb81224` for `only sidebar` / `sidebar+top toolbar`.
 
-| Flexoki Light | Catppuccin |
+![Comparative — Flexoki Light vs Catppuccin (2560×720)](screenshots/comparative-unified.png)
+
+| Flexoki Light (desktop + Zen) | Catppuccin (desktop + Zen) |
 |---|---|
 | ![Flexoki Light](screenshots/comparative-light.png) | ![Catppuccin](screenshots/comparative-dark.png) |
 
-> Captures with fix `3aa1045` (unified sidebar, no 1px gap). Zen `custom-zen.css` symlinked to `~/.local/state/omarchy/current/theme/custom-zen.css`. Restart Zen after `omarchy theme set`.
+> Each capture: 2560×1440 desktop tiled with Zen `Settings` — `custom-zen.css` symlinked to `~/.local/state/omarchy/current/theme/custom-zen.css`. Restart Zen after `omarchy theme set` to apply.
 
 ## Why Omarchy Zen?
 
