@@ -4,6 +4,18 @@ Syncs Omarchy's Pywal palette into Zen Browser — pure CSS, no extension, no na
 
 > **Based on [gstrand99/zen-auto-style](https://github.com/gstrand99/zen-auto-style)** by Gregory Strand (MIT). This project evolves that work into a maintained Omarchy plugin (`io.github.davidxap.omarchy-zen`) with a hardened CSS-only approach. The original extension implementation is preserved in [`legacy/`](legacy/).
 
+![Omarchy Zen preview](preview.png)
+
+## Screenshots
+
+Zen `about:preferences` themed via Omarchy — same palette as your desktop, no extension.
+
+| Flexoki Light + Zen | Catppuccin + Zen | Details |
+|---|---|---|
+| ![Zen Flexoki](screenshots/zen-omarchy-settings-1.png) | ![Zen Catppuccin](screenshots/zen-omarchy-settings-2.png) | ![Zen Settings](screenshots/zen-omarchy-settings-3.png) |
+
+> Captures: 2560×1440, Zen with `custom-zen.css` symlinked to `~/.local/state/omarchy/current/theme/custom-zen.css`. Restart Zen after `omarchy theme set` to apply.
+
 ## Why Omarchy Zen?
 
 - **No privileged prefs** — only `toolkit.legacyUserProfileCustomizations.stylesheets = true` (Mozilla standard). No `xpinstall.signatures.required=false`, no `extensions.experiments.enabled=true`.
