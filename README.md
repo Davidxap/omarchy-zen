@@ -100,6 +100,18 @@ No `python`/`zip`/`jq` needed (except `jq` for legacy reconciler cleanup).
 
 All `var()` have fallbacks; warnings in `verify.sh` are non-fatal (cascade still provides colors).
 
+### Testing with a clean Zen profile
+
+To test the plugin in a clean state (no Zen Mods, no third-party extensions, no leftover CSS):
+
+1. **Back up** your current Zen profile `chrome/` directory.
+2. **Empty** `userChrome.css` and `userContent.css` (set to empty files).
+3. **Remove** all `zen-auto-style-*` files, `zen-themes.css`, `zen-themes/`, and `custom-zen.css` from `chrome/`.
+4. **Run** `./install.sh` from the plugin directory.
+5. **Restart Zen** and verify the theme loads without visual artifacts.
+
+Zen Mods (e.g. Better Letterboxing) and other CSS extensions can inject gradients, shadows, or borders that interfere with the plugin's theming. If you see unexpected lines or color artifacts, test with a clean profile first to isolate the issue.
+
 ## Uninstall
 
 ```bash
