@@ -89,9 +89,28 @@ remove_exact_line() {
   mv "$temporary" "$target"
 }
 
-# Unconditional home-level cleanup: hook, template, install stamp, legacy artifacts.
+# Unconditional home-level cleanup: hook, template, install stamp, deployed
+# renderer, and backups. Everything install.sh puts under the plugin state
+# dir goes away; only a user-customized template is preserved.
 rm -f "$HOME/.config/omarchy/hooks/theme-set.d/zen-auto-style"
 rm -f "$HOME/.local/state/zen-auto-style/installed"
+rm -f "$HOME/.local/state/zen-auto-style/render-custom-zen.py"
+rm -rf "$HOME/.local/state/zen-auto-style/__pycache__"
+rm -rf "$HOME/.local/state/zen-auto-style/backups"
+rdir="$HOME/.local/state/zen-auto-style"
+if [[ -d $rdir ]] && [[ -z $(ls -A "$rdir") ]]; then
+  rmdir "$rdir"
+fi
+
+# If the Omarchy plugin is still registered, its Service auto-runs install.sh
+# on every shell start and will silently reinstall everything removed above.
+# Warn loudly instead of pretending the uninstall stuck.
+plugin_dir="$HOME/.config/omarchy/plugins/io.github.davidxap.omarchy-zen"
+if [[ -d $plugin_dir ]]; then
+  echo "WARNING: the Omarchy plugin is still installed at $plugin_dir." >&2
+  echo "Its service re-runs install.sh on shell start and will reinstall." >&2
+  echo "Remove it first: omarchy plugin remove io.github.davidxap.omarchy-zen" >&2
+fi
 
 template="$HOME/.config/omarchy/themed/custom-zen.css.tpl"
 if [[ -f $template ]] && cmp -s "$template" "$project_dir/assets/omarchy/custom-zen.css.tpl"; then
