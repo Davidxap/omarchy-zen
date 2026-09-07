@@ -68,14 +68,29 @@ remove_managed_block() {
 
   [[ -f $target ]] || return 0
   temporary="$(mktemp)"
+  # Exact inverse of ensure_managed_block, which writes
+  # BEGIN\n<content>\nEND\n\n<old content>: drop the block plus the single
+  # blank line ensure appended after END, restoring the original bytes.
   awk \
     -v begin="$begin_marker" \
     -v end="$end_marker" '
       $0 == begin { managed = 1; next }
-      $0 == end { managed = 0; next }
-      !managed { print }
+      managed && $0 == end { managed = 0; skip_blank = 1; next }
+      skip_blank && $0 == "" { skip_blank = 0; next }
+      { skip_blank = 0; print }
     ' "$target" >"$temporary"
   mv "$temporary" "$target"
+}
+
+# If cleanup left nothing but whitespace, the file did not exist (or had no
+# personal content) before install: delete it so Zen returns to default-absent
+# state instead of keeping an empty ghost file.
+remove_if_blank() {
+  local target=$1
+  [[ -f $target ]] || return 0
+  if ! grep -q '[^[:space:]]' "$target"; then
+    rm -f "$target"
+  fi
 }
 
 remove_exact_line() {
@@ -144,6 +159,12 @@ if zen_profile="$(find_zen_profile)"; then
   remove_exact_line "$chrome_dir/userChrome.css" '@import url("zen-auto-style-chrome.css");'
   remove_exact_line "$chrome_dir/userChrome.css" '@import url("zen-auto-style-mods.css");'
   remove_exact_line "$chrome_dir/userContent.css" '@import url("zen-auto-style-content.css");'
+
+  # Drop ghost files the installer created so Zen sees default-absent state.
+  # Files with personal content are preserved untouched.
+  remove_if_blank "$chrome_dir/userChrome.css"
+  remove_if_blank "$chrome_dir/userContent.css"
+  remove_if_blank "$zen_profile/user.js"
 
   rm -f \
     "$chrome_dir/zen-auto-style-chrome.css" \
@@ -236,4 +257,8 @@ if [ "$profile_found" -eq 1 ]; then
 else
   echo "Profile not found — ghost addon id cleanup skipped (no Zen profile discovered)."
 fi
-echo "User-owned CSS outside the managed blocks was preserved."
+echo "User-owned CSS outside the managed blocks was preserved; files left"
+echo "empty are deleted so Zen returns to its default state."
+echo ""
+echo "IMPORTANT: restart Zen now. A running Zen keeps the old theme in"
+echo "memory until restarted, so the theme will still look applied."
