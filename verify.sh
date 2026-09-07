@@ -55,7 +55,6 @@ fi
 css_files=(
   "$project_dir/assets/zen/zen-auto-style-chrome.css"
   "$project_dir/assets/zen/zen-auto-style-content.css"
-  "$project_dir/assets/zen/mods/"*.css
 )
 
 # Unique zen-specific ids (e.g., #zen-main-app-wrapper)

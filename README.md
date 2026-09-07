@@ -46,7 +46,7 @@ Both install:
 - `~/.config/omarchy/themed/custom-zen.css.tpl` (Pywal template)
 - `~/.config/omarchy/hooks/theme-set.d/zen-auto-style` (hook — re-renders the sheet from the resolved palette and posts a desktop notification when the theme changes)
 - `~/.local/state/zen-auto-style/render-custom-zen.py` (deterministic renderer used by the hook and the installer fallback)
-- Zen profile `chrome/zen-auto-style-chrome.css`, `zen-auto-style-content.css`, `zen-auto-style-mods.css`, `chrome/custom-zen.css` → symlink
+- Zen profile `chrome/zen-auto-style-chrome.css`, `zen-auto-style-content.css`, `chrome/custom-zen.css` → symlink
 - `user.js` pref `toolkit.legacyUserProfileCustomizations.stylesheets`
 
 Restart Zen → `omarchy theme set <name>` → the hook re-renders the sheet; restart Zen to see the new palette.
@@ -60,23 +60,6 @@ Restart Zen → `omarchy theme set <name>` → the hook re-renders the sheet; re
 5. `omarchy theme refresh` regenerates the stylesheet (install wraps it in a timeout and verifies the result, re-rendering from `colors.toml` on mismatch); next Zen restart picks it up via symlink.
 
 No extension, no host, no background process.
-
-## Optional Zen mods
-
-| Mod | Effect |
-|---|---|
-| `compact-rounded-content` | 8px spacing, 10px webview corners |
-| `flat-sidebar` | Removes sidebar/content shadows |
-| `sidebar-splitter-hover` | Animated splitter hover |
-| `unloaded-tabs` | Grayscale + transparent unloaded tabs |
-
-```bash
-./install.sh
-ZEN_AUTO_STYLE_MODS=all ./install.sh
-ZEN_AUTO_STYLE_MODS='sidebar-splitter-hover,unloaded-tabs' ./install.sh
-```
-
-Re-running regenerates `zen-auto-style-mods.css`.
 
 ## Requirements
 
@@ -138,7 +121,7 @@ Pywal palettes occasionally ship a low-contrast foreground/background pair or a 
 
 ## Performance
 
-The service re-runs `install.sh` on every shell start, but the install is gated: if the plugin version, mod selection, and wiring are unchanged, the script exits in milliseconds with no writes and no backups. Backups are rotated (last 5 kept) and file writes only happen when content actually changed (`cmp` before every `install`).
+The service re-runs `install.sh` on every shell start, but the install is gated: if the plugin version and wiring are unchanged, the script exits in milliseconds with no writes and no backups. Backups are rotated (last 5 kept) and file writes only happen when content actually changed (`cmp` before every `install`).
 
 ## Legacy (live reload without restart)
 

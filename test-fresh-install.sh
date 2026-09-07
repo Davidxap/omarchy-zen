@@ -135,7 +135,6 @@ check_file() {
 
 check_file "$chrome_dir/zen-auto-style-chrome.css"
 check_file "$chrome_dir/zen-auto-style-content.css"
-check_file "$chrome_dir/zen-auto-style-mods.css"
 check_file "$chrome_dir/custom-zen.css"
 check_file "$chrome_dir/userChrome.css"
 check_file "$chrome_dir/userContent.css"
