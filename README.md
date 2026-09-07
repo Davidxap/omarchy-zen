@@ -6,7 +6,7 @@ Syncs Omarchy's Pywal palette into Zen Browser — pure CSS, no extension, no na
 
 ## Screenshots
 
-Themes used, left to right: **Osiris**, **Woman with Floral Composition**, **BlackTurq**. Osiris and Floral are stock Omarchy themes; BlackTurq is available from [HANCORE-linux/omarchy-blackturq-theme](https://github.com/HANCORE-linux/omarchy-blackturq-theme). The bar shown in the screenshots is the [Shibumi-Shell](https://github.com/HANCORE-linux/Shibumi-Shell) by HANCORE (a Quickshell shell for Omarchy).
+Themes used, left to right: **Osiris**, **Woman with Floral Composition**, **BlackTurq**. Osiris is available from [xElectric9177/Osiris](https://github.com/xElectric9177/Osiris); Woman with Floral Composition is found through the [omarchy-themes plugin](https://omarchyplugins.com/plugin.html?id=gotar.omarchy-themes) (install themes directly from the marketplace); BlackTurq is available from [HANCORE-linux/omarchy-blackturq-theme](https://github.com/HANCORE-linux/omarchy-blackturq-theme). The bar shown in the screenshots is the [Shibumi-Shell](https://github.com/HANCORE-linux/Shibumi-Shell) by HANCORE (a Quickshell shell for Omarchy).
 
 | | | |
 |---|---|---|
