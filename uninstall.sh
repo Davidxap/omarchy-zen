@@ -250,6 +250,12 @@ if [ "$profile_found" -eq 1 ]; then
 fi
 
 # Final status messages — only what actually ran.
+if [[ -d $plugin_dir ]]; then
+  echo "Install type: Omarchy plugin (registered)."
+else
+  echo "Install type: standalone (not registered in Omarchy; 'omarchy plugin"
+  echo "remove' does not apply — this script is the complete removal)."
+fi
 echo "Removed Zen Auto Style's Omarchy hook, browser imports, and managed files."
 if [ "$profile_found" -eq 1 ]; then
   echo "Legacy native host and extension artifacts cleaned up."

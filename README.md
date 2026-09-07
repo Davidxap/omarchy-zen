@@ -99,15 +99,28 @@ Zen Mods (e.g. Better Letterboxing) and other CSS extensions can inject gradient
 
 ## Uninstall
 
+Two install types exist — use the matching removal:
+
+**Standalone install** (cloned repo + `./install.sh`, not registered in Omarchy):
+
 ```bash
 ./uninstall.sh
-# or via plugin dir
+```
+
+**Omarchy plugin install** (via `omarchy plugin install`, registered):
+
+```bash
 ~/.config/omarchy/plugins/io.github.davidxap.omarchy-zen/uninstall.sh
-# then
 omarchy plugin remove io.github.davidxap.omarchy-zen --yes
 ```
 
-Removes hook, managed imports, pref (preserving user CSS outside blocks), template if unchanged, legacy host/artifacts, ghost `zen-auto-style@omarchy.local` from `prefs.js`/`weave/addonsreconciler.json` (requires Zen closed).
+`omarchy plugin remove` alone only unregisters the plugin; it does **not**
+remove the Zen wiring (by design — the service never auto-uninstalls CSS).
+Run `uninstall.sh` first for the wiring, then `plugin remove` if registered.
+If `plugin remove` says "not installed", yours was a standalone install:
+`uninstall.sh` alone is the complete removal.
+
+Removes hook, managed imports, pref (preserving user CSS outside blocks), template if unchanged, legacy host/artifacts, ghost `zen-auto-style@omarchy.local` from `prefs.js`/`weave/addonsreconciler.json` (requires Zen closed). Restart Zen after uninstall — a running Zen keeps the old theme in memory.
 
 ## Theme switch behavior
 
