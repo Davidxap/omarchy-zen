@@ -54,8 +54,11 @@
   --newtab-background-color: var(--custom-zen-surface-0, #1a1b26) !important;
 }
 
+/* Site-identity (page) icon: full fg, never the panel color. Panel is a
+ * background tone, so painting a glyph with it is ~1:1 contrast in light
+ * themes (and barely better in dark ones) — the icon vanishes. */
 #permissions-granted-icon {
-  color: var(--custom-zen-panel, #16161e) !important;
+  color: var(--custom-zen-fg, #c0caf5) !important;
 }
 
 .sidebar-placesTree,
@@ -145,13 +148,16 @@ panel {
   background: var(--custom-zen-surface-1, #24283b) !important;
 }
 
+/* Pressed/open toolbar buttons keep the fg fill. Filling the glyph with the
+ * page background inverts it to ~1:1 contrast on light themes (light glyph
+ * on the light toolbar) — the icon disappears the moment its panel opens. */
 toolbar .toolbarbutton-1:not([disabled]):is([open], [checked])
   > :is(
     .toolbarbutton-icon,
     .toolbarbutton-text,
     .toolbarbutton-badge-stack
   ) {
-  fill: var(--custom-zen-bg, #1a1b26) !important;
+  fill: var(--custom-zen-fg, #c0caf5) !important;
 }
 
 .identity-color-blue {
