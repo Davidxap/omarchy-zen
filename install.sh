@@ -12,7 +12,8 @@ elif [[ -d "$HOME/.zen" ]]; then
 else
   zen_root="$HOME/.config/zen"
 fi
-backup_root="$HOME/.local/state/zen-auto-style/backups/$(date +%Y%m%d-%H%M%S-%N)-$$)"
+state_dir="$HOME/.local/state/zen-auto-style"
+backup_root="$state_dir/backups/$(date +%Y%m%d-%H%M%S-%N)-$$"
 available_mods=(
   compact-rounded-content
   flat-sidebar
@@ -81,15 +82,28 @@ backup_file() {
   fi
 }
 
+# Install with backups, skipping identical content (keeps mtimes stable and
+# avoids pointless writes on re-runs).
+install_file() {
+  local src=$1 dst=$2 mode=$3
+
+  if [[ -f $dst && ! -L $dst ]] && cmp -s "$src" "$dst"; then
+    return 0
+  fi
+  backup_file "$dst"
+  install -m "$mode" "$src" "$dst"
+}
+
 ensure_managed_block() {
   local target=$1
   local begin_marker=$2
   local end_marker=$3
   local content=$4
   local temporary
+  local existed=0
 
+  [[ -e $target ]] && existed=1
   touch "$target"
-  backup_file "$target"
   temporary="$(mktemp)"
 
   awk \
@@ -105,8 +119,13 @@ ensure_managed_block() {
     cat "$temporary"
   } >"$temporary.new"
 
-  mv "$temporary.new" "$target"
-  rm -f "$temporary"
+  if cmp -s "$temporary.new" "$target"; then
+    rm -f "$temporary" "$temporary.new"
+  else
+    (( existed )) && backup_file "$target"
+    mv "$temporary.new" "$target"
+    rm -f "$temporary"
+  fi
 }
 
 remove_legacy_line() {
@@ -162,26 +181,45 @@ mkdir -p \
   "$template_dir" \
   "$chrome_dir"
 
-install -m 755 \
+# Fast path: if this exact plugin version and mod selection are already
+# installed and the wiring is intact, there is nothing to do. Keeps the
+# service's per-login run in the low milliseconds (no writes, no backups).
+plugin_version="$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' "$project_dir/manifest.json" | head -n1)"
+stamp_file="$state_dir/installed"
+stamp_value="${plugin_version:-unknown}|${mods_value:-none}"
+if [[ -f $stamp_file ]] && [[ $stamp_value == "$(cat "$stamp_file")" ]] \
+  && [[ -L $chrome_dir/custom-zen.css ]] \
+  && grep -qs 'BEGIN ZEN AUTO STYLE' "$chrome_dir/userChrome.css" \
+  && grep -qs 'legacyUserProfileCustomizations.stylesheets' "$zen_profile/user.js" \
+  && cmp -s "$project_dir/assets/omarchy/custom-zen.css.tpl" "$template_dir/custom-zen.css.tpl" 2>/dev/null \
+  && cmp -s "$project_dir/assets/zen/zen-auto-style-chrome.css" "$chrome_dir/zen-auto-style-chrome.css" 2>/dev/null \
+  && cmp -s "$project_dir/omarchy/theme-set-hook" "$hook_dir/zen-auto-style" \
+  && [[ -f $state_dir/render-custom-zen.py ]]; then
+  echo "Omarchy Zen ${plugin_version:-?} already installed; nothing to do."
+  exit 0
+fi
+
+install_file \
   "$project_dir/omarchy/theme-set-hook" \
-  "$hook_dir/zen-auto-style"
+  "$hook_dir/zen-auto-style" 755
 
-backup_file "$template_dir/custom-zen.css.tpl"
-install -m 644 \
+mkdir -p "$state_dir"
+install_file \
+  "$project_dir/tools/render-custom-zen.py" \
+  "$state_dir/render-custom-zen.py" 755
+
+install_file \
   "$project_dir/assets/omarchy/custom-zen.css.tpl" \
-  "$template_dir/custom-zen.css.tpl"
+  "$template_dir/custom-zen.css.tpl" 644
 
-backup_file "$chrome_dir/zen-auto-style-chrome.css"
-install -m 644 \
+install_file \
   "$project_dir/assets/zen/zen-auto-style-chrome.css" \
-  "$chrome_dir/zen-auto-style-chrome.css"
-backup_file "$chrome_dir/zen-auto-style-content.css"
-install -m 644 \
+  "$chrome_dir/zen-auto-style-chrome.css" 644
+install_file \
   "$project_dir/assets/zen/zen-auto-style-content.css" \
-  "$chrome_dir/zen-auto-style-content.css"
+  "$chrome_dir/zen-auto-style-content.css" 644
 
 mods_dir="$chrome_dir/zen-auto-style-mods"
-backup_file "$chrome_dir/zen-auto-style-mods.css"
 rm -rf "$mods_dir"
 mkdir -p "$mods_dir"
 
@@ -196,7 +234,15 @@ done
   for mod in "${selected_mods[@]}"; do
     printf '@import url("zen-auto-style-mods/%s.css");\n' "$mod"
   done
-} >"$chrome_dir/zen-auto-style-mods.css"
+} >"$chrome_dir/zen-auto-style-mods.css.new"
+
+if [[ -f $chrome_dir/zen-auto-style-mods.css ]] \
+  && cmp -s "$chrome_dir/zen-auto-style-mods.css.new" "$chrome_dir/zen-auto-style-mods.css"; then
+  rm -f "$chrome_dir/zen-auto-style-mods.css.new"
+else
+  backup_file "$chrome_dir/zen-auto-style-mods.css"
+  mv "$chrome_dir/zen-auto-style-mods.css.new" "$chrome_dir/zen-auto-style-mods.css"
+fi
 
 remove_legacy_line \
   "$chrome_dir/userChrome.css" \
@@ -267,11 +313,40 @@ rm -f "$HOME/.mozilla/native-messaging-hosts/org.omarchy.zen_auto_style.json"
 rm -rf "$HOME/.cache/zen-auto-style"
 
 if command -v omarchy >/dev/null 2>&1; then
-  if ! omarchy theme refresh >/dev/null 2>&1; then
+  if ! timeout 30 omarchy theme refresh >/dev/null 2>&1; then
     echo "Warning: 'omarchy theme refresh' failed; run it manually." >&2
   fi
 else
   echo "Warning: omarchy is not on PATH; run 'omarchy theme refresh' later." >&2
+fi
+
+# Deterministic guard: omarchy skips template renders when the theme ships its
+# own custom-zen.css or a theme switch was interrupted, leaving a stale sheet
+# behind. Verify the state sheet matches the resolved palette and re-render
+# from colors.toml if it does not.
+_theme_root="$(dirname "$_theme_custom_css")"
+if [[ -f $state_dir/render-custom-zen.py && -f $_theme_root/colors.toml && -f $_theme_custom_css ]]; then
+  _expected="$(sed -n 's/^background *= *"\(#[0-9a-fA-F]\{6\}\)"/\1/p' "$_theme_root/colors.toml" | head -n1)"
+  _actual="$(sed -n 's/--custom-zen-bg: *\(#[0-9a-fA-F]\{6\}\);/\1/p' "$_theme_custom_css" | head -n1)"
+  if [[ $_expected != "$_actual" ]]; then
+    if timeout 30 python3 "$state_dir/render-custom-zen.py" "$_theme_root/colors.toml" "$_theme_custom_css" \
+      >/dev/null 2>&1; then
+      echo "Re-rendered custom-zen.css from the current palette."
+    else
+      echo "Warning: could not re-render custom-zen.css from colors.toml." >&2
+    fi
+  fi
+fi
+
+# Stamp the successful install so subsequent runs can take the fast path.
+mkdir -p "$state_dir"
+printf '%s\n' "$stamp_value" >"$stamp_file"
+
+# Keep only the 5 most recent backups.
+if [[ -d $backup_root ]]; then
+  while IFS= read -r old; do
+    rm -rf "$old"
+  done < <(ls -1d "$state_dir"/backups/*/ 2>/dev/null | sort -r | tail -n +6)
 fi
 
 echo "Installed Zen CSS into: $zen_profile"

@@ -4,7 +4,7 @@ set -euo pipefail
 
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-required_commands=(awk grep install mktemp sed)
+required_commands=(awk grep install mktemp rg sed)
 missing_commands=()
 
 for command in "${required_commands[@]}"; do

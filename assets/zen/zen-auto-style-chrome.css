@@ -45,6 +45,8 @@
   --newtab-text-primary-color: var(--custom-zen-fg, #c0caf5) !important;
   --arrowpanel-color: var(--custom-zen-fg, #c0caf5) !important;
   --arrowpanel-background: var(--custom-zen-surface-0, #1a1b26) !important;
+  --panel-background: var(--custom-zen-surface-0, #1a1b26) !important;
+  --panel-color: var(--custom-zen-fg, #c0caf5) !important;
   --sidebar-text-color: var(--custom-zen-fg, #c0caf5) !important;
   --lwt-sidebar-text-color: var(--custom-zen-fg, #c0caf5) !important;
   --lwt-sidebar-background-color: var(--custom-zen-bg, #1a1b26) !important;
@@ -74,16 +76,69 @@
 }
 
 .urlbarView-url {
-  color: var(--custom-zen-accent, #7aa2f7) !important;
+  color: var(--custom-zen-accent-hover, #89b4fa) !important;
+}
+
+/*
+ * Legibility guards. Pywal palettes occasionally ship a low-contrast
+ * foreground/background pair (or a washed-out accent), which makes the
+ * one text you are actively typing — the URL bar — unreadable. These
+ * rules pin critical interactive text to full-strength foreground on a
+ * known surface, so even the worst palette stays readable.
+ */
+
+/* URL bar, search and find inputs: full fg on surface, accent caret. */
+#urlbar-input,
+#urlbar-input-container,
+.searchbar-textbox,
+.findbar-textbox {
+  color: var(--custom-zen-fg, #c0caf5) !important;
+  caret-color: var(--custom-zen-accent, #7aa2f7) !important;
+}
+
+/* Suggestion rows: titles always full fg; the accent-colored URL line
+ * drops the accent when its row is selected, because accent-on-panel is
+ * the combination low-contrast palettes break first. */
+.urlbarView-title {
+  color: var(--custom-zen-fg, #c0caf5) !important;
+}
+
+.urlbarView-row:where([selected], :hover) .urlbarView-url,
+.urlbarView-row:where([selected], :hover) .urlbarView-title {
+  color: var(--custom-zen-fg, #c0caf5) !important;
+}
+
+/* Placeholders keep the muted look but never below the faint level. */
+#urlbar-input::placeholder,
+.searchbar-textbox::placeholder {
+  color: var(--custom-zen-fg-faint, rgba(192, 202, 245, 0.65)) !important;
+}
+
+/* Selection inside browser chrome uses the palette's selection pair with
+ * an accent fallback, so selected text never matches its background. */
+#navigator-toolbox ::selection,
+#urlbar ::selection,
+searchbar ::selection,
+findbar ::selection {
+  background: var(--custom-zen-selection-bg, var(--custom-zen-accent, #7aa2f7)) !important;
+  color: var(--custom-zen-selection-fg, var(--custom-zen-bg, #1a1b26)) !important;
 }
 
 #zenEditBookmarkPanelFaviconContainer {
   background: var(--custom-zen-bg, #1a1b26) !important;
 }
 
-/* Preserve native popup colors instead of Zen's forced dark panel background. */
-menupopup {
-  --panel-background: revert !important;
+/* Menus, context menus and dropdowns: tie foreground AND background to the
+ * same palette pair. Reverting the background to the native value while the
+ * text color stays themed produced white-on-white menus in dark themes (and
+ * the reverse in light ones), so both sides of the pair are set here. */
+menupopup,
+panel {
+  color-scheme: var(--custom-zen-color-scheme, dark) !important;
+  color: var(--custom-zen-fg, #c0caf5) !important;
+  background: var(--custom-zen-surface-0, #1a1b26) !important;
+  --panel-background: var(--custom-zen-surface-0, #1a1b26) !important;
+  --panel-color: var(--custom-zen-fg, #c0caf5) !important;
 }
 
 #zen-media-controls-toolbar #zen-media-progress-bar::-moz-range-track {

@@ -89,8 +89,9 @@ remove_exact_line() {
   mv "$temporary" "$target"
 }
 
-# Unconditional home-level cleanup: hook, template, legacy artifacts.
+# Unconditional home-level cleanup: hook, template, install stamp, legacy artifacts.
 rm -f "$HOME/.config/omarchy/hooks/theme-set.d/zen-auto-style"
+rm -f "$HOME/.local/state/zen-auto-style/installed"
 
 template="$HOME/.config/omarchy/themed/custom-zen.css.tpl"
 if [[ -f $template ]] && cmp -s "$template" "$project_dir/assets/omarchy/custom-zen.css.tpl"; then
@@ -184,7 +185,6 @@ if [ "$profile_found" -eq 1 ]; then
     temporary="$(mktemp)"
     # Drop the trailing }); then strip the orphan comma+entry before it.
     sed "s/,\"$legacy_addon_id\":\"[^\"]*\"//" "$prefs_file" \
-      | sed "s/,\"$legacy_addon_id\":\"[^\"]*\"//" \
       >"$temporary"
     mv "$temporary" "$prefs_file"
   }

@@ -1,11 +1,33 @@
 #!/bin/bash
 
-# Zen Auto Style theme-set hook.
+# Omarchy Zen theme-set hook.
 #
-# Omarchy renders custom-zen.css.tpl into custom-zen.css BEFORE running
-# theme-set hooks, and the chrome/ symlink already points to it. So there
-# is nothing to do here — Zen will pick up the updated CSS on next restart.
+# Omarchy renders custom-zen.css.tpl into current/theme/custom-zen.css before
+# theme-set hooks run, and the chrome/ symlink already points at it. That
+# render is skipped when the theme directory ships its own custom-zen.css or
+# when a theme switch is interrupted, so re-render deterministically from the
+# resolved current palette here. Zen reads the sheet at startup, so the new
+# palette applies on the next restart; all we can safely do beyond the render
+# is tell the user.
 #
-# This hook exists so that future enhancements (e.g. notifications, live
-# reload signals) can be added without touching install.sh.
+# Risks: none — every step is time-boxed and failure must never break
+# `omarchy theme set`.
+
+renderer="$HOME/.local/state/zen-auto-style/render-custom-zen.py"
+theme_dir="$HOME/.local/state/omarchy/current/theme"
+slug="${1:-}"
+
+if [[ -f $renderer && -f $theme_dir/colors.toml ]]; then
+  timeout 10 python3 "$renderer" "$theme_dir/colors.toml" "$theme_dir/custom-zen.css" \
+    >/dev/null 2>&1 || true
+fi
+
+if command -v notify-send >/dev/null 2>&1; then
+  timeout 5 notify-send \
+    "Omarchy Zen" \
+    "Theme updated ($slug) — restart Zen to apply the new palette" \
+    --icon=zen-browser \
+    >/dev/null 2>&1 || true
+fi
+
 true

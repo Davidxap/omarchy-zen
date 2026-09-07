@@ -11,8 +11,8 @@
   --custom-zen-border: color-mix(in srgb, {{ background }} 80%, {{ foreground }});
   --custom-zen-panel: color-mix(in srgb, {{ background }} 88%, {{ foreground }});
 
-  --custom-zen-accent-hover: color-mix(in srgb, {{ accent }} 85%, white);
-  --custom-zen-accent-active: color-mix(in srgb, {{ accent }} 85%, black);
+  --custom-zen-accent-hover: {{ accent_hover }};
+  --custom-zen-accent-active: {{ accent_active }};
 
   --custom-zen-red: {{ color1 }};
   --custom-zen-green: {{ color2 }};
@@ -27,6 +27,6 @@
   --custom-zen-selection-bg: {{ selection_background }};
   --custom-zen-selection-fg: {{ selection_foreground }};
 
-  --custom-zen-fg-muted: rgba({{ foreground_rgb }}, 0.7);
-  --custom-zen-fg-faint: rgba({{ foreground_rgb }}, 0.55);
+  --custom-zen-fg-muted: rgba({{ foreground_rgb }}, 0.75);
+  --custom-zen-fg-faint: rgba({{ foreground_rgb }}, 0.65);
 }
