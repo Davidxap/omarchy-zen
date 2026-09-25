@@ -117,13 +117,10 @@
   color: var(--custom-zen-fg-faint, rgba(192, 202, 245, 0.65)) !important;
 }
 
-/* Selection inside browser chrome uses the palette's selection pair with
- * an accent fallback, so selected text never matches its background. */
-#navigator-toolbox ::selection,
-#urlbar ::selection,
-searchbar ::selection,
-findbar ::selection {
-  background: var(--custom-zen-selection-bg, var(--custom-zen-accent, #7aa2f7)) !important;
+/* Apply the palette's selection pair across browser chrome, including
+ * editable fields outside the toolbox. */
+::selection {
+  background-color: var(--custom-zen-selection-bg, var(--custom-zen-accent, #7aa2f7)) !important;
   color: var(--custom-zen-selection-fg, var(--custom-zen-bg, #1a1b26)) !important;
 }
 
