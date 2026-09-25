@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Release checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure ripgrep
+        run: command -v rg >/dev/null || (sudo apt-get update && sudo apt-get install -y ripgrep)
+
+      - name: Run release checks
+        run: ./check.sh
+
+      - name: Validate manifest.json
+        run: python3 -c 'import json; m=json.load(open("manifest.json")); assert m["id"] and m["version"] and m["name"]; print(m["id"], "v" + m["version"])'
