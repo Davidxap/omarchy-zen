@@ -148,12 +148,32 @@ Original XPI + Python host in [`legacy/`](legacy/) — not installed by default,
 
 ## Changelog
 
+### 1.3.0
+- **Themed text selection on every website** — the content stylesheet's `::selection` rules now sit *outside* the `@-moz-document` URL scope, so page selection follows the palette on all sites instead of only the matched ones; the browser chrome gets its own `::selection` too. ([#2](https://github.com/Davidxap/omarchy-zen/pull/2), thanks [caniswim](https://github.com/caniswim) / BrunnoVert.)
+- **Stale-stylesheet install bug fixed** — the installer's fast path compared nothing before skipping, so a changed template could ship with the previous render. It now `cmp`s the deployed file against a fresh render. Reproduced on `main` before the fix; passes after.
+- **Verified legibility of the selection pair** — all 22 shipped themes measure ≥4.5:1 (WCAG AA) on their selection foreground/background (worst: 4.88:1).
+
 ### 1.2.0
 - **Guaranteed legibility across light and dark themes** — the renderer binary-searches accent-derived colors to WCAG AA (≥4.5:1) against the panel instead of a blind `color-mix`; menus/panels always pin background + foreground to the same palette pair (fixes white-on-white in dark themes).
 - **Deterministic theme→Zen sync** — the `theme-set` hook re-renders the sheet from the resolved `colors.toml` and notifies with the theme name; the installer wraps `omarchy theme refresh` in a timeout and verifies the rendered background, re-rendering on mismatch.
 - **Install hardening** — `timeout` on refresh, post-install palette verification with a deterministic re-render fallback, and a fast-path re-check so unchanged installs exit in milliseconds.
 - **Reusable deterministic renderer** — `tools/render-custom-zen.py` shared by the hook, the installer fallback, and the screenshot pipeline.
 - **Branded theme screenshots** — Osiris, Woman with Floral Composition, and BlackTurq; preview shows Osiris.
+
+### 1.0.3
+- **Sidebar seam fixed** — no more vertical line between sidebar and content.
+- **Testing docs** — clean-profile instructions for troubleshooting; marketplace preview image.
+
+### 1.0.2
+- **Bounded installer output** — byte-ceiling guards so a runaway loop can't fill the log.
+
+### 1.0.1
+- **Marketplace validation fixes** — the Quickshell `StdioCollector` is now bounded (it was unbounded, a memory ceiling risk in a long-lived shell); `uninstall.sh` gained a proper `backup_file()` and restructured guards so cleanup only runs against a real Zen profile.
+- **Sidebar gaps closed** — no black/white line at the top of the sidebar, and correct edge colours in light and dark themes.
+
+### 1.0.0
+- **First marketplace release** — plugin id `io.github.davidxap.omarchy-zen`, headless Quickshell service, installer/uninstaller, plus `check.sh`, `verify.sh`, and `test-fresh-install.sh` as repo gates.
+- **Rebrand to Omarchy Zen Themes Sync** — CSS-only install path, with the legacy live-reload extension moved to `legacy/`.
 
 ## License
 
