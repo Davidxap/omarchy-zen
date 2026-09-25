@@ -1,11 +1,16 @@
 @import url("custom-zen.css");
 
 /*
- * All rules are scoped to internal about: pages only via @-moz-document.
- * Website content is never touched. Every var() carries a fallback so that
- * a broken symlink or unrendered Omarchy template degrades gracefully to
- * a dark palette instead of producing invalid CSS.
+ * Page styling is scoped to internal about: pages via @-moz-document. Text
+ * selection also follows the Omarchy palette on websites. Every var() carries
+ * a fallback so that a broken symlink or unrendered Omarchy template degrades
+ * gracefully to a dark palette instead of producing invalid CSS.
  */
+
+::selection {
+  background-color: var(--custom-zen-selection-bg, var(--custom-zen-accent, #7aa2f7)) !important;
+  color: var(--custom-zen-selection-fg, var(--custom-zen-bg, #1a1b26)) !important;
+}
 
 @-moz-document url-prefix("about:") {
   :root {

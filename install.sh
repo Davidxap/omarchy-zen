@@ -161,6 +161,7 @@ if [[ -f $stamp_file ]] && [[ $stamp_value == "$(cat "$stamp_file")" ]] \
   && grep -qs 'legacyUserProfileCustomizations.stylesheets' "$zen_profile/user.js" \
   && cmp -s "$project_dir/assets/omarchy/custom-zen.css.tpl" "$template_dir/custom-zen.css.tpl" 2>/dev/null \
   && cmp -s "$project_dir/assets/zen/zen-auto-style-chrome.css" "$chrome_dir/zen-auto-style-chrome.css" 2>/dev/null \
+  && cmp -s "$project_dir/assets/zen/zen-auto-style-content.css" "$chrome_dir/zen-auto-style-content.css" 2>/dev/null \
   && cmp -s "$project_dir/omarchy/theme-set-hook" "$hook_dir/zen-auto-style" \
   && [[ -f $state_dir/render-custom-zen.py ]]; then
   echo "Omarchy Zen ${plugin_version:-?} already installed; nothing to do."
