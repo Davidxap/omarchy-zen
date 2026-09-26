@@ -5,7 +5,7 @@
   "version": "1.4.0",
   "author": "David Arturo Arroyave Pérez",
   "license": "MIT",
-  "description": "Auto-themes Zen Browser from your Omarchy palette — pure CSS, no extension. Re-skins sidebar, toolbar, menus, new tab and text selection on every theme switch with guaranteed WCAG-legible contrast.",
+  "description": "Auto-themes Zen Browser from your Omarchy palette — pure CSS, no extension, no privileged prefs, no background daemon. Theme switches apply live with no browser restart. Re-skins sidebar, toolbar, menus, new tab and text selection with guaranteed WCAG-legible contrast.",
   "homepage": "https://github.com/Davidxap/omarchy-zen",
   "repository": "https://github.com/Davidxap/omarchy-zen",
   "kinds": ["service"],
