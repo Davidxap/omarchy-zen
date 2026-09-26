@@ -1,6 +1,6 @@
 # Omarchy Zen Themes Sync
 
-Syncs Omarchy's Pywal palette into Zen Browser — pure CSS, no extension, no native host. Install as an Omarchy shell plugin or standalone script. Survives Zen updates gracefully.
+Syncs Omarchy's Pywal palette into Zen Browser — pure CSS, no extensions, no privileged preferences, no native host, no background daemon, and **live theme switches with no browser restart**. Install as an Omarchy shell plugin or standalone script. Survives Zen updates gracefully.
 
 > **Started as a fork of [gstrand99/zen-auto-style](https://github.com/gstrand99/zen-auto-style)** by Gregory Strand (MIT) — original template, CSS and extension. It has since grown well past its source: Omarchy 4.x support, a hardened CSS-only install, WCAG-legible theming, themed selection on every site, and live reload with no extension or weakened prefs. The original extension lives on unchanged in [`legacy/`](legacy/).
 
@@ -16,10 +16,12 @@ Themes used, left to right: **Osiris**, **Woman with Floral Composition**, **Bla
 
 ## Why Omarchy Zen?
 
+- **Live theme switches, no browser restart** — run `./live.sh enable` once and every later `omarchy theme set` repaints Zen in about a second. You never close and reopen the browser to change themes again. Opt-in: one `sudo` prompt, then it stays out of the way.
 - **No privileged prefs** — only `toolkit.legacyUserProfileCustomizations.stylesheets = true` (Mozilla standard). No `xpinstall.signatures.required=false`, no `extensions.experiments.enabled=true`.
 - **Pure CSS bridge** — Omarchy renders `custom-zen.css.tpl` → `~/.local/state/omarchy/current/theme/custom-zen.css`, Zen reads it via symlink in `chrome/custom-zen.css`.
 - **Themed text selection** — selected text in browser controls, internal pages, and websites uses the theme's selection background and foreground colors.
-- **Resilient** — every `var(--custom-zen-*)` has a fallback (`#24283b`, `#7aa2f7` etc.). If Zen renames a selector, the `:root` layer still cascades.
+- **Guaranteed legibility (WCAG AA)** — the renderer binary-searches the minimum adjustment that keeps accent-derived text readable against the panel, in both light and dark palettes.
+- **Resilient** — every `var(--custom-zen-*)` has a fallback (`#24283b`, `#7aa2f7` etc.). If Zen renames a selector, the `:root` layer still cascades; `verify.sh` checks the selectors after a Zen update.
 - **Omarchy-native** — ships as a `service` plugin (`Service.qml`) that auto-runs `install.sh` on shell start. Also works standalone.
 
 ## Install
@@ -32,7 +34,7 @@ omarchy plugin add https://github.com/Davidxap/omarchy-zen.git --enable
 ~/.config/omarchy/plugins/io.github.davidxap.omarchy-zen/install.sh
 ```
 
-Restart Zen once to load `userChrome.css`.
+**One restart, ever.** Restart Zen a single time to load `userChrome.css`, then run `./live.sh enable` (one `sudo` prompt) and restart once more. From that point on, changing themes never requires closing the browser again — see [Live reload](#live-reload-optional-no-extension).
 
 ### Option B — Standalone
 
@@ -128,6 +130,8 @@ Removes hook, managed imports, pref (preserving user CSS outside blocks), templa
 By default Zen reads `userChrome.css` only at startup, so a new palette needs a **Zen restart** after `omarchy theme set`. The theme-set hook posts a desktop notification — `Theme changed: <theme>` — so you always know which palette is now current.
 
 ### Live reload (optional, no extension)
+
+> **You do not have to close and reopen Zen to change themes.** After a single `./live.sh enable`, `omarchy theme set` repaints the browser in about a second — sidebar, toolbar, menus, new tab and text selection, all live.
 
 ```bash
 ./live.sh enable    # asks for sudo once; restart Zen one last time
