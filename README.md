@@ -125,9 +125,21 @@ Removes hook, managed imports, pref (preserving user CSS outside blocks), templa
 
 ## Theme switch behavior
 
-Unlike the old XPI, CSS-only **requires a Zen restart** after `omarchy theme set`. The symlink updates instantly, but Zen only reloads `userChrome.css` on startup. This is intentional for security and update-resilience.
+By default Zen reads `userChrome.css` only at startup, so a new palette needs a **Zen restart** after `omarchy theme set`. The theme-set hook posts a desktop notification ("Theme updated — restart Zen to apply the new palette") so you never have to remember it.
 
-The theme-set hook posts a desktop notification ("Theme updated — restart Zen to apply the new palette") after every `omarchy theme set`, so you never have to remember the restart step. No daemon, no polling — just one notification.
+### Live reload (optional, no extension)
+
+```bash
+./live.sh enable    # asks for sudo once; restart Zen one last time
+./live.sh status
+./live.sh disable
+```
+
+From then on every theme switch repaints Zen within about a second, no restart. It uses Firefox's built-in [autoconfig](https://support.mozilla.org/kb/customizing-firefox-using-autoconfig) instead of an extension: `live/omarchy-zen.cfg` is copied into Zen's install dir and, at startup, polls `chrome/custom-zen.css` once per second and re-registers its `--custom-zen-*` variables when the file changes.
+
+- **No** extension, native host, open port, daemon, signature bypass or experiments pref.
+- **Tradeoff:** it writes two root-owned files into the Zen install dir (`omarchy-zen.cfg`, `defaults/pref/omarchy-zen-prefs.js`) and runs that script with browser privileges. It is ~70 readable lines; it only reads the palette file and registers CSS.
+- Inert on profiles without Omarchy Zen, survives `zen-browser-bin` upgrades (pacman keeps unowned files), refuses to overwrite another autoconfig loader. `uninstall.sh` disables it.
 
 ## Legibility guarantees (1.2.0)
 
@@ -137,9 +149,9 @@ Pywal palettes occasionally ship a low-contrast foreground/background pair or a 
 
 The service re-runs `install.sh` on every shell start, but the install is gated: if the plugin version and wiring are unchanged, the script exits in milliseconds with no writes and no backups. Backups are rotated (last 5 kept) and file writes only happen when content actually changed (`cmp` before every `install`).
 
-## Legacy (live reload without restart)
+## Legacy
 
-Original XPI + Python host in [`legacy/`](legacy/) — not installed by default, kept for reference and updated for Omarchy 4.x / Quattro. If you prefer live reload without restarting Zen, use the legacy build (requires `xpinstall.signatures.required=false` + `extensions.experiments.enabled=true`). See `legacy/README.md`.
+Original XPI + Python host in [`legacy/`](legacy/) — not installed, kept for reference. Superseded by `live.sh`, which gives the same live reload without `xpinstall.signatures.required=false` or `extensions.experiments.enabled=true`. See `legacy/README.md`.
 
 ## Credits
 
@@ -147,6 +159,10 @@ Original XPI + Python host in [`legacy/`](legacy/) — not installed by default,
 - **David Arturo Arroyave Pérez** ([Davidxap](https://github.com/Davidxap)) — Omarchy 4.x compat, CSS-only hardening, plugin packaging (`Omarchy Zen Themes Sync`).
 
 ## Changelog
+
+### 1.4.0
+- **Live theme reload without extensions (opt-in)** — `./live.sh enable` installs a Firefox autoconfig script that re-applies the palette within a second of `omarchy theme set`, no Zen restart. Replaces the legacy XPI path and its two security-sensitive prefs. Verified on Zen 1.22.3b (Firefox 156) for atomic file swaps and in-place rewrites.
+- The theme-set notification says "applied live" when live reload is enabled.
 
 ### 1.3.0
 - **Themed text selection on every website** — the content stylesheet's `::selection` rules now sit *outside* the `@-moz-document` URL scope, so page selection follows the palette on all sites instead of only the matched ones; the browser chrome gets its own `::selection` too. ([#2](https://github.com/Davidxap/omarchy-zen/pull/2), thanks [caniswim](https://github.com/caniswim) / BrunnoVert.)

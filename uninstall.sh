@@ -104,6 +104,13 @@ remove_exact_line() {
   mv "$temporary" "$target"
 }
 
+# Live reload lives in the root-owned Zen install dir. It is inert without the
+# chrome/zen-auto-style-chrome.css removed below, but remove it when enabled.
+if [[ -f $HOME/.local/state/zen-auto-style/live ]]; then
+  "$project_dir/live.sh" disable \
+    || echo "Warning: could not remove live reload; run ./live.sh disable (inert meanwhile)." >&2
+fi
+
 # Unconditional home-level cleanup: hook, template, install stamp, deployed
 # renderer, and backups. Everything install.sh puts under the plugin state
 # dir goes away; only a user-customized template is preserved.
