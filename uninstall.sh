@@ -114,7 +114,8 @@ fi
 # Unconditional home-level cleanup: hook, template, install stamp, deployed
 # renderer, and backups. Everything install.sh puts under the plugin state
 # dir goes away; only a user-customized template is preserved.
-rm -f "$HOME/.config/omarchy/hooks/theme-set.d/zen-auto-style"
+rm -f "$HOME/.config/omarchy/hooks/theme-set.d/00-zen-auto-style"
+rm -f "$HOME/.config/omarchy/hooks/theme-set.d/zen-auto-style" # pre-1.4.1 name
 rm -f "$HOME/.local/state/zen-auto-style/installed"
 rm -f "$HOME/.local/state/zen-auto-style/render-custom-zen.py"
 rm -rf "$HOME/.local/state/zen-auto-style/__pycache__"
