@@ -2,7 +2,7 @@
 
 Syncs Omarchy's Pywal palette into Zen Browser — pure CSS, no extension, no native host. Install as an Omarchy shell plugin or standalone script. Survives Zen updates gracefully.
 
-> **Based on [gstrand99/zen-auto-style](https://github.com/gstrand99/zen-auto-style)** by Gregory Strand (MIT). This project evolves that work into a maintained Omarchy plugin (`io.github.davidxap.omarchy-zen`) with a hardened CSS-only approach. The original extension implementation is preserved in [`legacy/`](legacy/).
+> **Started as a fork of [gstrand99/zen-auto-style](https://github.com/gstrand99/zen-auto-style)** by Gregory Strand (MIT) — original template, CSS and extension. It has since grown well past its source: Omarchy 4.x support, a hardened CSS-only install, WCAG-legible theming, themed selection on every site, and live reload with no extension or weakened prefs. The original extension lives on unchanged in [`legacy/`](legacy/).
 
 ## Screenshots
 
