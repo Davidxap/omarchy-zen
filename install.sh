@@ -162,15 +162,23 @@ if [[ -f $stamp_file ]] && [[ $stamp_value == "$(cat "$stamp_file")" ]] \
   && cmp -s "$project_dir/assets/omarchy/custom-zen.css.tpl" "$template_dir/custom-zen.css.tpl" 2>/dev/null \
   && cmp -s "$project_dir/assets/zen/zen-auto-style-chrome.css" "$chrome_dir/zen-auto-style-chrome.css" 2>/dev/null \
   && cmp -s "$project_dir/assets/zen/zen-auto-style-content.css" "$chrome_dir/zen-auto-style-content.css" 2>/dev/null \
-  && cmp -s "$project_dir/omarchy/theme-set-hook" "$hook_dir/zen-auto-style" \
+  && cmp -s "$project_dir/omarchy/theme-set-hook" "$hook_dir/00-zen-auto-style" \
+  && [[ ! -e $hook_dir/zen-auto-style ]] \
   && [[ -f $state_dir/render-custom-zen.py ]]; then
   echo "Omarchy Zen ${plugin_version:-?} already installed; nothing to do."
   exit 0
 fi
 
+# `omarchy-hook theme-set` runs ~/.config/omarchy/hooks/theme-set.d/* in
+# alphabetical order and waits on every one of them, so the installed filename
+# decides when the "Theme changed" notification shows up. The bare
+# `zen-auto-style` name sorted after the slow app-retint hooks (vscode, firefox,
+# zen, theme extras), which is why the notification lagged a full theme switch
+# by seconds. The `00-` prefix puts it at the front of the loop.
+rm -f "$hook_dir/zen-auto-style"
 install_file \
   "$project_dir/omarchy/theme-set-hook" \
-  "$hook_dir/zen-auto-style" 755
+  "$hook_dir/00-zen-auto-style" 755
 
 mkdir -p "$state_dir"
 install_file \
@@ -274,7 +282,9 @@ fi
 _theme_root="$(dirname "$_theme_custom_css")"
 if [[ -f $state_dir/render-custom-zen.py && -f $_theme_root/colors.toml && -f $_theme_custom_css ]]; then
   _expected="$(sed -n 's/^background *= *"\(#[0-9a-fA-F]\{6\}\)"/\1/p' "$_theme_root/colors.toml" | head -n1)"
-  _actual="$(sed -n 's/--custom-zen-bg: *\(#[0-9a-fA-F]\{6\}\);/\1/p' "$_theme_custom_css" | head -n1)"
+  # The declaration is indented inside `:root`, so eat everything before it or
+  # the extracted value keeps its leading spaces and never compares equal.
+  _actual="$(sed -n 's/.*--custom-zen-bg: *\(#[0-9a-fA-F]\{6\}\);.*/\1/p' "$_theme_custom_css" | head -n1)"
   if [[ $_expected != "$_actual" ]]; then
     if timeout 30 python3 "$state_dir/render-custom-zen.py" "$_theme_root/colors.toml" "$_theme_custom_css" \
       >/dev/null 2>&1; then
