@@ -23,8 +23,12 @@ if [[ -f $renderer && -f $theme_dir/colors.toml ]]; then
     >/dev/null 2>&1 || true
 fi
 
+# `low` is deliberate: the shell clamps a toast to a floor of 8s for `normal`
+# and 5s for `low` (Service.qml, normalPopupDuration/lowPopupDuration), so
+# normal urgency would hold this on screen for eight seconds.
 if command -v notify-send >/dev/null 2>&1; then
   timeout 5 notify-send \
+    -u low \
     "Omarchy Zen" \
     "$message" \
     --icon=zen-browser \

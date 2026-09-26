@@ -167,6 +167,9 @@ Two people besides the maintainer have work merged into this repository right no
 
 ## Changelog
 
+### 1.4.2
+- **The toast clears half as fast** — `Theme changed: <theme>` is posted at `low` urgency. The shell clamps a toast to a floor of 8s for `normal` and 5s for `low`, so `normal` was pinning it on screen for eight seconds. Five seconds is the floor; nothing shorter is reachable from a sender.
+
 ### 1.4.1
 - **Notification no longer waits for the whole theme switch** — the hook is installed as `00-zen-auto-style` instead of `zen-auto-style`. `omarchy-hook theme-set` runs `theme-set.d/*` in alphabetical order and blocks on each one, so the old name sorted *after* the slow app-retint hooks (VS Code, Firefox, Zen, theme extras) and `Theme changed: <theme>` only appeared once they had all finished. It now runs first in the loop.
 - Credits rewritten: every contributor named, with the exact PR/commit each one shipped.
