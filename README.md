@@ -47,7 +47,7 @@ cd omarchy-zen
 Both install:
 
 - `~/.config/omarchy/themed/custom-zen.css.tpl` (Pywal template)
-- `~/.config/omarchy/hooks/theme-set.d/zen-auto-style` (hook — re-renders the sheet from the resolved palette and posts a desktop notification when the theme changes)
+- `~/.config/omarchy/hooks/theme-set.d/00-zen-auto-style` (hook — re-renders the sheet from the resolved palette and posts a desktop notification when the theme changes; `00-` so it runs before the slow app-retint hooks)
 - `~/.local/state/zen-auto-style/render-custom-zen.py` (deterministic renderer used by the hook and the installer fallback)
 - Zen profile `chrome/zen-auto-style-chrome.css`, `zen-auto-style-content.css`, `chrome/custom-zen.css` → symlink
 - `user.js` pref `toolkit.legacyUserProfileCustomizations.stylesheets`
@@ -159,11 +159,17 @@ Original XPI + Python host in [`legacy/`](legacy/) — not installed, kept for r
 
 ## Credits
 
+Two people besides the maintainer have work merged into this repository right now. Both of them are why it is better than the thing it started as.
+
 - **David Arturo Arroyave Pérez** ([Davidxap](https://github.com/Davidxap)) — maintainer. Omarchy 4.x compat, CSS-only hardening, WCAG-legible theming, themed selection, live reload without extensions, and the `Omarchy Zen Themes Sync` plugin packaging.
-- **Gregory Strand** ([gstrand99](https://github.com/gstrand99)) — original [`zen-auto-style`](https://github.com/gstrand99/zen-auto-style) (template, CSS, extension) that this project started as a fork of, MIT.
-- **BrunnoVert** ([caniswim](https://github.com/caniswim)) — themed text selection on every website ([#2](https://github.com/Davidxap/omarchy-zen/pull/2)).
+- **Gregory Strand** ([gstrand99](https://github.com/gstrand99)) — released the original [`zen-auto-style`](https://github.com/gstrand99/zen-auto-style) (template, CSS, extension) under MIT, and two of his commits (`3c844a4`, `0ea205a`) are still the foundation this repo is built on. His extension ships unchanged in [`legacy/`](legacy/). Thank you for building something worth forking — and for licensing it so anyone else could.
+- **BrunnoVert** ([caniswim](https://github.com/caniswim)) — opened [PR #2](https://github.com/Davidxap/omarchy-zen/pull/2), merged as `40dbcc8`: he moved the `::selection` rules out of the `@-moz-document` URL-matched scope so page text selection follows the active theme on **every** website instead of only the pattern-matched ones. That is the headline feature of 1.3.0. Thank you for the careful CSS work.
 
 ## Changelog
+
+### 1.4.1
+- **Notification no longer waits for the whole theme switch** — the hook is installed as `00-zen-auto-style` instead of `zen-auto-style`. `omarchy-hook theme-set` runs `theme-set.d/*` in alphabetical order and blocks on each one, so the old name sorted *after* the slow app-retint hooks (VS Code, Firefox, Zen, theme extras) and `Theme changed: <theme>` only appeared once they had all finished. It now runs first in the loop.
+- Credits rewritten: every contributor named, with the exact PR/commit each one shipped.
 
 ### 1.4.0
 - **Live theme reload without extensions (opt-in)** — `./live.sh enable` installs a Firefox autoconfig script that re-applies the palette within a second of `omarchy theme set`, no Zen restart. Replaces the legacy XPI path and its two security-sensitive prefs. Verified on Zen 1.22.3b (Firefox 156) for atomic file swaps and in-place rewrites.
