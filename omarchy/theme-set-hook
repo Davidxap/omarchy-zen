@@ -16,11 +16,7 @@
 renderer="$HOME/.local/state/zen-auto-style/render-custom-zen.py"
 theme_dir="$HOME/.local/state/omarchy/current/theme"
 slug="${1:-}"
-live_state="$HOME/.local/state/zen-auto-style/live"
-message="Theme updated ($slug) — restart Zen to apply the new palette"
-if [[ -f $live_state && -f "$(cat "$live_state")/omarchy-zen.cfg" ]]; then
-  message="Theme updated ($slug) — applied live"
-fi
+message="Theme changed: $slug"
 
 if [[ -f $renderer && -f $theme_dir/colors.toml ]]; then
   timeout 10 python3 "$renderer" "$theme_dir/colors.toml" "$theme_dir/custom-zen.css" \
