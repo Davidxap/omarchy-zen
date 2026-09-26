@@ -7,8 +7,8 @@
 # render is skipped when the theme directory ships its own custom-zen.css or
 # when a theme switch is interrupted, so re-render deterministically from the
 # resolved current palette here. Zen reads the sheet at startup, so the new
-# palette applies on the next restart; all we can safely do beyond the render
-# is tell the user.
+# palette applies on the next restart, unless live reload (live.sh) is enabled,
+# in which case Zen picks the new sheet up within a second.
 #
 # Risks: none — every step is time-boxed and failure must never break
 # `omarchy theme set`.
@@ -16,6 +16,11 @@
 renderer="$HOME/.local/state/zen-auto-style/render-custom-zen.py"
 theme_dir="$HOME/.local/state/omarchy/current/theme"
 slug="${1:-}"
+live_state="$HOME/.local/state/zen-auto-style/live"
+message="Theme updated ($slug) — restart Zen to apply the new palette"
+if [[ -f $live_state && -f "$(cat "$live_state")/omarchy-zen.cfg" ]]; then
+  message="Theme updated ($slug) — applied live"
+fi
 
 if [[ -f $renderer && -f $theme_dir/colors.toml ]]; then
   timeout 10 python3 "$renderer" "$theme_dir/colors.toml" "$theme_dir/custom-zen.css" \
@@ -25,7 +30,7 @@ fi
 if command -v notify-send >/dev/null 2>&1; then
   timeout 5 notify-send \
     "Omarchy Zen" \
-    "Theme updated ($slug) — restart Zen to apply the new palette" \
+    "$message" \
     --icon=zen-browser \
     >/dev/null 2>&1 || true
 fi
