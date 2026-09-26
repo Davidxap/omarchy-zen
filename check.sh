@@ -19,6 +19,7 @@ fi
 bash -n \
   "$project_dir/check.sh" \
   "$project_dir/install.sh" \
+  "$project_dir/live.sh" \
   "$project_dir/uninstall.sh" \
   "$project_dir/test-fresh-install.sh" \
   "$project_dir/verify.sh" \
