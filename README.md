@@ -50,7 +50,7 @@ Both install:
 - Zen profile `chrome/zen-auto-style-chrome.css`, `zen-auto-style-content.css`, `chrome/custom-zen.css` → symlink
 - `user.js` pref `toolkit.legacyUserProfileCustomizations.stylesheets`
 
-Restart Zen → `omarchy theme set <name>` → the hook re-renders the sheet; restart Zen to see the new palette.
+Restart Zen once → `omarchy theme set <name>` → the hook re-renders the sheet and notifies you with the theme name. With [live reload](#live-reload-optional-no-extension) enabled, the new palette appears immediately.
 
 ## How it works
 
@@ -125,7 +125,7 @@ Removes hook, managed imports, pref (preserving user CSS outside blocks), templa
 
 ## Theme switch behavior
 
-By default Zen reads `userChrome.css` only at startup, so a new palette needs a **Zen restart** after `omarchy theme set`. The theme-set hook posts a desktop notification ("Theme updated — restart Zen to apply the new palette") so you never have to remember it.
+By default Zen reads `userChrome.css` only at startup, so a new palette needs a **Zen restart** after `omarchy theme set`. The theme-set hook posts a desktop notification — `Theme changed: <theme>` — so you always know which palette is now current.
 
 ### Live reload (optional, no extension)
 
@@ -162,7 +162,7 @@ Original XPI + Python host in [`legacy/`](legacy/) — not installed, kept for r
 
 ### 1.4.0
 - **Live theme reload without extensions (opt-in)** — `./live.sh enable` installs a Firefox autoconfig script that re-applies the palette within a second of `omarchy theme set`, no Zen restart. Replaces the legacy XPI path and its two security-sensitive prefs. Verified on Zen 1.22.3b (Firefox 156) for atomic file swaps and in-place rewrites.
-- The theme-set notification says "applied live" when live reload is enabled.
+- The theme-set notification now reads `Theme changed: <theme>` — theme name only, no restart nag.
 
 ### 1.3.0
 - **Themed text selection on every website** — the content stylesheet's `::selection` rules now sit *outside* the `@-moz-document` URL scope, so page selection follows the palette on all sites instead of only the matched ones; the browser chrome gets its own `::selection` too. ([#2](https://github.com/Davidxap/omarchy-zen/pull/2), thanks [caniswim](https://github.com/caniswim) / BrunnoVert.)
