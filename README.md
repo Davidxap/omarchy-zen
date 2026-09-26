@@ -159,8 +159,9 @@ Original XPI + Python host in [`legacy/`](legacy/) — not installed, kept for r
 
 ## Credits
 
-- **Gregory Strand** ([gstrand99](https://github.com/gstrand99)) — original `zen-auto-style` (template, CSS, extension).
-- **David Arturo Arroyave Pérez** ([Davidxap](https://github.com/Davidxap)) — Omarchy 4.x compat, CSS-only hardening, plugin packaging (`Omarchy Zen Themes Sync`).
+- **David Arturo Arroyave Pérez** ([Davidxap](https://github.com/Davidxap)) — maintainer. Omarchy 4.x compat, CSS-only hardening, WCAG-legible theming, themed selection, live reload without extensions, and the `Omarchy Zen Themes Sync` plugin packaging.
+- **Gregory Strand** ([gstrand99](https://github.com/gstrand99)) — original [`zen-auto-style`](https://github.com/gstrand99/zen-auto-style) (template, CSS, extension) that this project started as a fork of, MIT.
+- **BrunnoVert** ([caniswim](https://github.com/caniswim)) — themed text selection on every website ([#2](https://github.com/Davidxap/omarchy-zen/pull/2)).
 
 ## Changelog
 
