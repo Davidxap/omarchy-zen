@@ -3,10 +3,10 @@
 
 This mirrors Omarchy's pywal mapping (color0=background, color7=foreground,
 color8=muted, ...) and its theme-mode precedence (mode key, theme_type key,
-background luminance auto-detection, dark). The plugin falls back to this
-renderer when `omarchy theme refresh` leaves a stale palette behind, and the
-screenshot pipeline uses it to produce preview images without switching the
-desktop theme.
+light.mode file beside colors.toml, background luminance auto-detection, dark).
+The plugin falls back to this renderer when `omarchy theme refresh` leaves a
+stale palette behind, and the screenshot pipeline uses it to produce preview
+images without switching the desktop theme.
 
 Usage: render-custom-zen.py COLORS_TOML OUTPUT [CUSTOM_ZEN_TPL]
 """
@@ -78,10 +78,14 @@ def mix(hex_a, hex_b, pct):
                          for i in range(3))
 
 
-def theme_mode(values):
+def theme_mode(values, colors_dir=None):
     for key in ('mode', 'theme_type'):
         if key in values:
             return values[key]
+    # Legacy marker: an empty light.mode file beside colors.toml (same
+    # precedence as `omarchy-theme-color`).
+    if colors_dir is not None and (Path(colors_dir) / 'light.mode').exists():
+        return 'light'
     if 'background' in values:
         if luminance(values['background']) >= 0.5:
             return 'light'
@@ -143,7 +147,7 @@ def main():
         print(__doc__)
         return 2
     values = parse(sys.argv[1])
-    values['mode'] = theme_mode(values)
+    values['mode'] = theme_mode(values, Path(sys.argv[1]).resolve().parent)
     values.update(palette(values))
     if len(sys.argv) > 3:
         tpl_path = Path(sys.argv[3])
